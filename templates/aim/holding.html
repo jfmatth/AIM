@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if object %}
+
+    <h1>Holding {{ object.stock }}</h1>
+    <table>
+        <tr>Transactions</tr>
+        {% for t in object.transaction_set.all %}
+            <tr>
+                <td>{{ t }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+{% endblock %}
