@@ -130,9 +130,9 @@ def holding_add(request):
             h = form.save()
             
             # jfm - add a AimValue control parameter record 1-1
-            av = AimValue()
-            av.holding = h
-            av.save()            
+            #av = Aim()
+            #av.holding = h
+            #av.save()            
             
             return HttpResponseRedirect('/aim/holding/%s' % str(h.id) )
     else:

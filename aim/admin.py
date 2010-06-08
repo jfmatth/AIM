@@ -8,7 +8,7 @@ class TransactionAdmin(admin.ModelAdmin):
 admin.site.register(Transaction, TransactionAdmin)
 
 class HoldingAdmin(admin.ModelAdmin):
-    list_display = ('stock', 'nextbuy', 'nextsell', 'pricenow', 'shares')
+    list_display = ('stock', 'nextbuy', 'nextsell', 'CurrentPrice', 'shares', 'control')
     
     def nextbuy(self, obj):
         return "%.2f" % obj.NextBuy()
@@ -16,12 +16,14 @@ class HoldingAdmin(admin.ModelAdmin):
     def nextsell(self, obj):
         return "%.2f" % obj.NextSell()
         
-    def pricenow(self, obj):
-        return "%.2f" % obj.stock.current_price()
+    def CurrentPrice(self, obj):
+        return "%.2f" % obj.stock.CurrentPrice()
         
     def shares(self, obj):
         return "%.2f" % obj.shares()
-    
+        
+    def control(self, obj):
+        return "%.2f" % obj.aim.control
     
 admin.site.register(Holding, HoldingAdmin)
 
@@ -47,6 +49,6 @@ admin.site.register(Price, PriceAdmin)
 
 class AimAdmin(admin.ModelAdmin):
     pass
-admin.site.register(Aim, AimAdmin)
+admin.site.register(AimStandard, AimAdmin)
 
 
