@@ -276,7 +276,7 @@ class Transaction(models.Model):
         #        ordering = ["-date"]
 
         def __unicode__(self):
-                return "%s %s (%s @ %s)" % (self.holding,self.date, self.shares,self.price)
+                return "%s %s (%s @ %s)" % (self.holding, self.date, self.shares, self.price)
                 
         def total(self):
                 return self.shares * self.price
