@@ -8,13 +8,13 @@ class TransactionAdmin(admin.ModelAdmin):
 admin.site.register(Transaction, TransactionAdmin)
 
 class HoldingAdmin(admin.ModelAdmin):
-    list_display = ('stock', 'nextbuy', 'nextsell', 'CurrentPrice', 'shares', 'control')
+    list_display = ('stock', 'BuyPrice', 'SellPrice', 'CurrentPrice', 'shares', 'control', 'buyamount', 'sellamount')
     
-    def nextbuy(self, obj):
-        return "%.2f" % obj.NextBuy()
+    def BuyPrice(self, obj):
+        return "%.2f" % obj.aim.BuyPrice()
         
-    def nextsell(self, obj):
-        return "%.2f" % obj.NextSell()
+    def SellPrice(self, obj):
+        return "%.2f" % obj.aim.SellPrice()
         
     def CurrentPrice(self, obj):
         return "%.2f" % obj.stock.CurrentPrice()
@@ -24,6 +24,12 @@ class HoldingAdmin(admin.ModelAdmin):
         
     def control(self, obj):
         return "%.2f" % obj.aim.control
+    
+    def buyamount(self, obj):
+        return "%.2f" % obj.aim.BuyAmount()
+        
+    def sellamount(self, obj):
+        return "%.2f" % obj.aim.SellAmount()
     
 admin.site.register(Holding, HoldingAdmin)
 

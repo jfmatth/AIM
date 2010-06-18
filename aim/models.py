@@ -166,7 +166,7 @@ class AimBase(models.Model):
         buysafe   = models.IntegerField(default=10)          # SAFE for buys
         buymin    = models.IntegerField(default=500)         # Minimum to buy
                 
-        # Holy SH1t I just figure out the forumla I've been using hasn't been right, and missed these figures
+        # Holy Shit! I just figure out the forumla I've been using hasn't been right, and missed these figures
         # they are the percentage of value to buy / sell each time, instead of the fixed values above (buyin/sellmin).
         # Crap!
         buyperc    = models.IntegerField(default=10)          # how much percent of value to buy
@@ -175,10 +175,14 @@ class AimBase(models.Model):
         def __unicode__(self):
                 return "Base class for Aim"
         
-        def NextBuy(self):
+        def BuyPrice(self):
                 return Decimal(0)
-
-        def NextSell(self):
+        def BuyAmount(self):
+                return Decimal(0)
+                
+        def SellPrice(self):
+                return Decimal(0)
+        def SellAmount(self):
                 return Decimal(0)
                 
         def transaction(self, transaction=None):
@@ -188,14 +192,15 @@ class AimBase(models.Model):
                 abstract = True
 
 class AimStandard(AimBase):
-        def NextBuy(self):
+        def BuyPrice(self):
                 if self.control <> 0:
                         # JFM, 5/3/2010 - Just realized that the above formula is WRONG!  All these years!
                         #
                         # below is the new formula from the aim-users website (http://aim-users.com/aimbrief.htm)
                         
-                        sm = self.holding.value() * (self.sellperc / Decimal(100) )
-                        bm = self.holding.value() * (self.buyperc / Decimal(100) )
+                        # JFM, account for the minimum amount field too.
+                        bm = self.holding.value() * (self.buyperc / Decimal(100) ) 
+                        
                         pc = Decimal(self.control)
                         N  = Decimal(self.holding.shares())
                         ss = Decimal(self.sellsafe) / Decimal(100)
@@ -205,11 +210,23 @@ class AimStandard(AimBase):
                         
                 else:
                         return Decimal(0)
+
+        def BuyAmount(self):
+                # Normal AIM formula for buy amount is
+                #
+                # PC - (Current Value + (Safe * Current value) )
+                #
+                amount = self.control - (self.holding.value() + (self.buysafe / Decimal(100) * self.holding.value()) )
+                if amount > 0:
+                        return amount
+                else:
+                        return 0            
                         
-        def NextSell(self):                
+        def SellPrice(self):                
                 if self.control <> 0:
+                        # JFM, 6/17/10, account for minimums too.
                         sm = self.holding.value() * (self.sellperc / Decimal(100) )
-                        bm = self.holding.value() * (self.buyperc / Decimal(100) )
+                        
                         pc = Decimal(self.control)
                         N  = Decimal(self.holding.shares() )
                         ss = Decimal(self.sellsafe) / Decimal(100)
@@ -218,6 +235,18 @@ class AimStandard(AimBase):
                         return (pc + sm) / (N * ( Decimal(1) - ss) )
                 else:
                         return Decimal(0)
+                        
+        def SellAmount(self):
+                # Normal AIM formula for sell amount is
+                #
+                #  PC + (Safe * Current value) - Current Value
+                #
+                amount = self.control + (self.sellsafe / Decimal(100) * self.holding.value() ) - self.holding.value()
+                if amount < 0 :
+                        return amount
+                else:
+                        return 0
+
 
         def transaction(self, transaction=None):
                 if transaction.total() > 0:
