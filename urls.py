@@ -10,9 +10,12 @@ from django.views.generic import TemplateView
 urlpatterns = patterns('',
                        
     (r'^$', TemplateView.as_view(template_name="bootstrap.html")),
-    
+
+	(r'about/$', TemplateView.as_view(template_name="about.html")),
+
+   	(r'contact/$', TemplateView.as_view(template_name="comingsoon.html")),
     # Example:
-    (r'^aim/', include('aim.urls') ),
+#    (r'^aim/', include('aim.urls') ),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
