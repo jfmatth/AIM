@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from decimal import *
 
 import datetime
-import aim_utilities
+import util.aim_utilities
 
 #
 # Stock

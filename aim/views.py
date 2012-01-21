@@ -156,9 +156,9 @@ def aim_login(request):
     if user is not None:
         if user.is_active:
             login(request, user)
-            return HttpResponseRedirect('/aim')
+            return HttpResponseRedirect('/')
         else:
-            return HttpResponseRedirect('/aim')
+            return HttpResponseRedirect('/')
             # Return a 'disabled account' error message
     else:
         return HttpResponseRedirect('/')

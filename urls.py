@@ -1,10 +1,16 @@
 from django.conf.urls.defaults import *
 
+from django.views.generic import TemplateView
+    
 # Uncomment the next two lines to enable the admin:
-from django.contrib import admin
-admin.autodiscover()
+#from django.contrib import admin
+#admin.autodiscover()
+
 
 urlpatterns = patterns('',
+                       
+    (r'^$', TemplateView.as_view(template_name="bootstrap.html")),
+    
     # Example:
     (r'^aim/', include('aim.urls') ),
 
@@ -13,8 +19,8 @@ urlpatterns = patterns('',
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
-    (r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/aim/'}),
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
 
     # Uncomment the next line to enable the admin:
-    (r'^admin/(.*)', admin.site.root),
+#    (r'^admin/(.*)', admin.site.root),
 )
