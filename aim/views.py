@@ -1,5 +1,8 @@
 from django.http import HttpResponse, HttpResponseRedirect
 
+
+from django.contrib.auth.decorators import login_required
+
 from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth import authenticate, login
@@ -9,6 +12,7 @@ from django.http import Http404
 from aim.models import *
 from aim.forms import *
 
+@login_required
 def index(request):
     if request.user.is_authenticated():
         qs = Portfolio.objects.filter(owner=request.user)    

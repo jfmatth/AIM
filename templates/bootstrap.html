@@ -3,12 +3,6 @@
   <head>
     <meta charset="utf-8">
   
-    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <!-- Le styles -->
   	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
     <style type="text/css">
       body {
@@ -16,7 +10,6 @@
       }
     </style>
 
-    <!-- Le fav and touch icons -->
   </head>
 
   <body>
@@ -37,9 +30,8 @@
 {% if user.is_authenticated %}
           <form action="/accounts/logout/" class="pull-right">
           {% csrf_token %}
-	          Hello {{ user.username}}
 	          <input type="hidden" name="next" value="/" />
-    	      <button class="btn" type="submit">Logout</button>
+    	      <button class="btn" type="submit">Logout {{user.username}}</button>
     	  </form> 
 {% else %}
 		<p class="pull-right">
@@ -64,7 +56,6 @@
         <h1>Make your stock portfolio shine</h1>
         <p>
         <p>Welcome to RetireOnAIM, the program that helps increase the value of your investments</p>
-        <p><a class="btn primary large">Learn more &raquo;</a></p>
       </div>
 
       <div class="row">
@@ -82,7 +73,7 @@
         </div>
  
         <div class="span-one-third">
-          <h2>How much does it costk?</h2>
+          <h2>How much does it cost?</h2>
           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
           <p><a class="btn" href="#">View details &raquo;</a></p>
         </div>

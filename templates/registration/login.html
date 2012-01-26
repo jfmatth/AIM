@@ -1,28 +1,57 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+  
+  	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
 
-{% block login-section %}
-{% endblock %}
+  </head>
 
-{% block content %}
+  <body>
+  
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="/">RetireOnAIM</a>
+        </div>
+      </div>
+    </div>
 
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+    <div class="container"> 
+		<div class="span16">
+			<h1>Login</h1>
+			<form class="form-stacked" method="post" action="{% url django.contrib.auth.views.login %}">
+				<fieldset>
+					<div class="clearfix">
+						{{ form.username.label_tag }}
+						<div class="input">
+							{{ form.username }}
+						</div>
+						{{ form.password.label_tag }}
+						<div class="input">
+							{{ form.password }}
+						</div>
+					</div>
+				</fieldset>
 
-<form method="post" action="{% url django.contrib.auth.views.login %}">
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
+				<div class="actions">
+					<button type="submit" class="btn primary">Login</button>
+					<input type="hidden" name="next" value="{{ next }}" />
+					{% csrf_token %} 
+				</div>
+				
+			</form>
+			<footer>
+				<p>&copy; Company 2011</p>
+			</footer>
+		</div>
 
-<input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+    </div>
 
-{% endblock %}
+  </body>
+</html>
