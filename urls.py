@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     (r'^$', TemplateView.as_view(template_name="bootstrap.html")),
     
     # Example:
-    (r'^aim/', include('aim.urls') ),
+#    (r'^aim/', include('aim.urls') ),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
