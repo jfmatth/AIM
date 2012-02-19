@@ -1,35 +1,35 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-    <title>{% block title %}{% endblock %}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=MacRoman">
-  </head>
-  <body>
-      {% block login-section %}
-        <h2> User info </h2>
-        {% if user.is_authenticated %}
-          Hello {{ user.username}} <a href="/accounts/logout">logout</a> <br>
-        {% else %}
-          Please <a href="/accounts/login">login</a> 
-          <p> - or - </p>
-          <form method="post" action="/aim/login/">
-          <table>
-          <tr>
-              <td>Username</td>
-              <td> <input type="text" name="username"> </td>
-          </tr>
-          <tr>
-              <td>Password</td>
-              <td> <input type="text" name="password"> </td>
-          </tr>
-          </table>          
-          <input type="submit" value="login" />
-          </form>
-        {% endif %}
-        
-      {% endblock %}
-      
-      {% block content %}
-      {% endblock %}
-  </body>
+
+    <head>
+        <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+
+        <!-- Le styles -->
+        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+        <style type="text/css">
+          body {
+              padding-top: 60px;
+          }
+        </style>
+
+        <!-- Le fav and touch icons -->
+        <link rel="shortcut icon" href="images/favicon.ico">
+        <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+
+        <title>{% block htmltitle %}{% endblock %}</title>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=MacRoman">
+
+    </head>
+
+    <body>
+        {% block htmlbody %}
+        {%  endblock %}
+    </body>
+
 </html>
