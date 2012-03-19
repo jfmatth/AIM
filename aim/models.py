@@ -11,9 +11,12 @@ import util.aim_utilities
 # Stock
 #
 
-class Stock(models.Model):
-        symbol      = models.CharField(max_length=10, unique=True)
+class Symbol(models.Model):
+        name        = models.CharField(max_length=10, unique=True, db_index=True)
         description = models.CharField(max_length=50, blank=True)
+
+        def __unicode__(self):
+            return self.name
 
         def CurrentPrice(self):
                 try:
@@ -23,59 +26,57 @@ class Stock(models.Model):
                         # and if we don't have any prices, just return 0 for now.
                         return 0
         
-        def price_now(self):
-                # figure out if we have today's price in the system, if not, download it.
-                try:
-                        p = self.price_set.get(date=datetime.date.today().__str__() )
-                except ObjectDoesNotExist:
-                        # well, that didn't work, so lets get it from Yahoo and save it in the DB
-                        yahoo_quote = aim_utilities.StockPrice(self.symbol)
-                        p = Price(stock=self,
-                                  date = yahoo_quote['date'],
-                                  high = yahoo_quote['high'],
-                                  low  = yahoo_quote['low'],
-                                  close = yahoo_quote['price'],
-                                  volume = yahoo_quote['volume']
-                                )
-                        p.save()
-                
-                return p
+#        def price_now(self):
+#                # figure out if we have today's price in the system, if not, download it.
+#                try:
+#                        p = self.price_set.get(date=datetime.date.today().__str__() )
+#                except ObjectDoesNotExist:
+#                        # well, that didn't work, so lets get it from Yahoo and save it in the DB
+#                        yahoo_quote = aim_utilities.StockPrice(self.symbol)
+#                        p = Price(stock=self,
+#                                  date = yahoo_quote['date'],
+#                                  high = yahoo_quote['high'],
+#                                  low  = yahoo_quote['low'],
+#                                  close = yahoo_quote['price'],
+#                                  volume = yahoo_quote['volume']
+#                                )
+#                        p.save()
+#
+#                return p
+#
+#        def GetHistorical(self):
+#                # gets a years worth of historical prices, yippie.
+#                i_prices = aim_utilities.HistoricalStockPrice(self.symbol,
+#                                                         datetime.date.today() - datetime.timedelta(days=365),
+#                                                         datetime.date.today()
+#                                                         )
+#                # each entry in the list is a date, starting with the header
+#
+#                # get a 'copy' of all the prices for this stock, so we only query it once, i hope
+#                db_prices = self.price_set.all()
+#
+#                # run through all the prices from Yahoo and see if they are already there, if not, add them to DB, this
+#                # will be painfull if all the prices are not there, well, atcually, it will be painfull regardless :)
+#                for dayprice in i_prices[1:]:
+#                        try:
+#                                db_prices.get(date=dayprice[0])
+#                        except ObjectDoesNotExist:
+#                                p = Price(stock=self,
+#                                          date = dayprice[0],
+#                                          high = dayprice[2],
+#                                          low  = dayprice[3],
+#                                          close = dayprice[4],
+#                                          volume = dayprice[5]
+#                                        )
+#                                p.save()
+#
                         
-        def GetHistorical(self):
-                # gets a years worth of historical prices, yippie.
-                i_prices = aim_utilities.HistoricalStockPrice(self.symbol,
-                                                         datetime.date.today() - datetime.timedelta(days=365),
-                                                         datetime.date.today()
-                                                         )
-                # each entry in the list is a date, starting with the header
-                
-                # get a 'copy' of all the prices for this stock, so we only query it once, i hope
-                db_prices = self.price_set.all()
-                
-                # run through all the prices from Yahoo and see if they are already there, if not, add them to DB, this
-                # will be painfull if all the prices are not there, well, atcually, it will be painfull regardless :)
-                for dayprice in i_prices[1:]:
-                        try:
-                                db_prices.get(date=dayprice[0])                        
-                        except ObjectDoesNotExist:
-                                p = Price(stock=self,
-                                          date = dayprice[0],
-                                          high = dayprice[2],
-                                          low  = dayprice[3],
-                                          close = dayprice[4],
-                                          volume = dayprice[5]
-                                        )
-                                p.save()
-
-                        
-        def __unicode__(self):
-                return self.symbol
 
 #
 # Price - Stock prices
 #
 class Price(models.Model):
-        stock  = models.ForeignKey(Stock)
+        symbol = models.ForeignKey(Symbol)
         date   = models.DateField(db_index=True)
         high   = models.DecimalField(max_digits=7, decimal_places=3)
         low    = models.DecimalField(max_digits=7, decimal_places=3)
@@ -83,7 +84,7 @@ class Price(models.Model):
         volume = models.IntegerField()
         
         def __unicode__(self):
-                return "%s %s %s" % (self.stock.symbol, self.date, self.close)
+                return "%s %s %s" % (self.symbol.name, self.date, self.close)
 
         class Meta:
                 ordering = ["-date"]
@@ -109,7 +110,7 @@ AIM_TYPES = (
 )
 class Holding(models.Model):
         portfolio    = models.ForeignKey(Portfolio)
-        stock        = models.ForeignKey(Stock)
+        symbol       = models.ForeignKey(Symbol)
         aimtype      = models.CharField(max_length=10, choices=AIM_TYPES, default="Standard")
 
         def getAim(self):
@@ -130,7 +131,7 @@ class Holding(models.Model):
                         super(Holding, self).save(force_insert, force_update)
 
         def __unicode__(self):
-                return "[%s in %s]" % (self.stock.symbol, self.portfolio)
+                return "[%s in %s]" % (self.symbol.name, self.portfolio)
 
         
         def shares(self):
@@ -141,7 +142,7 @@ class Holding(models.Model):
                 return s
         
         def value(self):
-                return self.shares() * self.stock.CurrentPrice()
+                return self.shares() * self.symbol.CurrentPrice()
                 
                 
         def NextBuy(self):

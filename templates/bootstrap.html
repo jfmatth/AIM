@@ -3,48 +3,10 @@
 {%  block htmlbody %}
 
     {%  block navbar %}
-        <div class="topbar">
-            <div class="fill">
-                <div class="container">
 
-                    <a class="brand" href="#">RetireOnAIM</a>
-
-                    <ul class="nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-
-                    <!-- User or login on toolbar? -->
-                    {% if user.is_authenticated %}
-                        <form action="/accounts/logout/" class="pull-right">
-                            {% csrf_token %}
-                            Hello {{ user.username}}
-                            <input type="hidden" name="next" value="/" />
-                            <button class="btn" type="submit">Logout</button>
-                        </form>
-                    {% else %}
-                        <p class="pull-right">
-                        <form method="post" action="/accounts/login/" class="pull-right">
-                            {% csrf_token %}
-                            <input class="input-small" type="text" name="username">
-                            <input class="input-small" type="password" name="password">
-                            <input type="hidden" name="next" value="/" />
-                            <button class="btn" type="submit">Login</button>
-                        </form>
-                        </p>
-                    {% endif %}
-
-                </div>
-            </div>
-        </div>
     {% endblock %}
 
     <div class="container">
-        <div class="hero-unit">
-        {% block hero %}
-        {% endblock %}
-        </div>
 
         {% block mainbody %}
         {% endblock %}
