@@ -78,9 +78,9 @@ class Symbol(models.Model):
 class Price(models.Model):
         symbol = models.ForeignKey(Symbol)
         date   = models.DateField(db_index=True)
-        high   = models.DecimalField(max_digits=7, decimal_places=3)
-        low    = models.DecimalField(max_digits=7, decimal_places=3)
-        close  = models.DecimalField(max_digits=7, decimal_places=3)
+        high   = models.DecimalField(max_digits=12, decimal_places=3)
+        low    = models.DecimalField(max_digits=12, decimal_places=3)
+        close  = models.DecimalField(max_digits=12, decimal_places=3)
         volume = models.IntegerField()
         
         def __unicode__(self):
