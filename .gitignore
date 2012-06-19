@@ -1,5 +1,5 @@
 *.sq3
-.DS_Store/*
 *.pyc
 .project
 .pydevproject
+manage.py
