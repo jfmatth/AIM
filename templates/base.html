@@ -1,18 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
     <head>
-        {% block html-head %}        {% endblock %}
-
-        <title>{% block html-title %}{% endblock %}</title>
+        {% block head %}{% endblock %}
+        <title>{% block title %}{% endblock %}</title>
     </head>
-
     <body>
-        {% block html-body %}
-        
-            {% block html-endbody %}
-            {% endblock %}    
-        
-        {%  endblock %}
+        {% block bodystart %}{% endblock %}
+        {% block body %}{% endblock %}
+        {% block bodyend %}{% endblock %}
     </body>
-    
 </html>

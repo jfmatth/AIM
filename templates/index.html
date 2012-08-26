@@ -1,75 +1,72 @@
 {% extends "bootstrap.html" %}
 
-({% block navbar %}
-    <div class="topbar">
-        <div class="fill">
-            <div class="container">
+{% block title %} Index page for AIM {% endblock %}
 
-                <a class="brand" href="#">RetireOnAIM</a>
+{% block bootstrap-nav %}
+    <a class="brand">RetireOnAIM</a>
 
-                <ul class="nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-
-                <!-- User or login on toolbar? -->
-                {% if user.is_authenticated %}
-                    <form action="/accounts/logout/" class="pull-right">
-                        {% csrf_token %}
-                        Hello {{ user.username}}
-                        <input type="hidden" name="next" value="/" />
-                        <button class="btn" type="submit">Logout</button>
-                    </form>
-                {% else %}
-                    <p class="pull-right">
-                    <form method="post" action="/accounts/login/" class="pull-right">
-                        {% csrf_token %}
-                        <input class="input-small" type="text" name="username">
-                        <input class="input-small" type="password" name="password">
-                        <input type="hidden" name="next" value="/" />
-                        <button class="btn" type="submit">Login</button>
-                    </form>
-                    </p>
-                {% endif %}
-
-            </div>
-        </div>
-    </div>
+    <!-- User or login on toolbar? -->
+    {% if user.is_authenticated %}
+        <form action="/accounts/logout/" class="pull-right">
+            {% csrf_token %}
+            Hello {{ user.username}}
+            <input type="hidden" name="next" value="/" />
+            <button class="btn" type="submit">Logout</button>
+        </form>
+    {% else %}
+        <p class="pull-right">
+        <form method="post" action="/accounts/login/" class="pull-right">
+            {% csrf_token %}
+            <input class="input-small" type="text" name="username">
+            <input class="input-small" type="password" name="password">
+            <input type="hidden" name="next" value="/" />
+            <button class="btn" type="submit">Login</button>
+        </form>
+        </p>
+    {% endif %}
 {% endblock %}
 
+{% block body %}
 
-{% if not user.is_authenticated %}
-    <div class="hero-unit">
-        <h1>Make your stock portfolio shine</h1>
-        <p>
-        <p>Welcome to RetireOnAIM, the program that helps increase the value of your investments</p>
-        <p><a class="btn primary large">Learn more &raquo;</a></p>
-    </div>
-{% else %}
-    <h1>Heading 1 now</h1>
-{% endif %}
+    <div  class="container">
 
-{%  block mainbody %}
+    {% if not user.is_authenticated %}
+        <div class="hero-unit">
+            <h1>Make your stock portfolio shine</h1>
+            <p>
+            <p>Welcome to RetireOnAIM, the program that helps increase the value of your investments</p>
+            <p><a class="btn primary large">Learn more &raquo;</a></p>
+        </div>
+    {% else %}
+        <div class="hero-unit">
+            <h1>The AIM-users website</h1>
+            <h2> You are logged in </h2>
+            
+        </div>
+    {% endif %}
+
+ 
     <div class="row">
 
-        <div class="span-one-third">
+        <div class="span3">
             <h2>Why use this?</h2>
             <p>Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
             <p><a class="btn" href="#">View details &raquo;</a></p>
         </div>
 
-        <div class="span-one-third">
+        <div class="span3">
             <h2>How does it work?</h2>
             <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
             <p><a class="btn" href="#">View details &raquo;</a></p>
         </div>
 
-        <div class="span-one-third">
+        <div class="span3">
             <h2>How much does it costk?</h2>
             <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
             <p><a class="btn" href="#">View details &raquo;</a></p>
         </div>
 
     </div> <!-- row -->
+
 {% endblock %}
+
