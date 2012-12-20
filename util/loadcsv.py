@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import csv
 import datetime
 
+
 """
 Loads a CSV file into the stock and price tables from EODDATA
 """
