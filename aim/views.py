@@ -9,7 +9,6 @@ from django.http import Http404
 from aim.models import *
 from aim.forms import *
 
-@login_required()
 def index(request):
     if request.user.is_authenticated():
         qs = Portfolio.objects.filter(owner=request.user)    

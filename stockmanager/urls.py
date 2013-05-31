@@ -24,6 +24,8 @@ urlpatterns = patterns('',
     
     url(r'^bootstrap/', BootstrapSampleView.as_view()),
     
+    #url(r'^aim/', include(aim.urls) ),
+    
     url(r'^$', IndexView.as_view() ),
     
 )
