@@ -1,4 +1,5 @@
 *.sq3
+*.db
 *.pyc
 .project
 .pydevproject
