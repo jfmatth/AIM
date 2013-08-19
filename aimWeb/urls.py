@@ -4,8 +4,6 @@ from django.views.generic import TemplateView
 class BootstrapSampleView(TemplateView):
     template_name = "sample.html"
     
-class IndexView(TemplateView):
-    template_name = "index.html"
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -26,6 +24,6 @@ urlpatterns = patterns('',
     
     #url(r'^aim/', include(aim.urls) ),
     
-    url(r'^$', IndexView.as_view() ),
+    url(r'^$', TemplateView.as_view(template_name = "index.html") ),
     
 )

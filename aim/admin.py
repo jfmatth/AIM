@@ -8,54 +8,28 @@ class TransactionAdmin(admin.ModelAdmin):
 admin.site.register(Transaction, TransactionAdmin)
 
 class HoldingAdmin(admin.ModelAdmin):
-    list_display = ('symbol', 'BuyPrice', 'SellPrice', 'CurrentPrice', 'shares', 'control', 'buyamount', 'sellamount')
-    
-    def BuyPrice(self, obj):
-        return "%.2f" % obj.aim.BuyPrice()
-        
-    def SellPrice(self, obj):
-        return "%.2f" % obj.aim.SellPrice()
-        
-    def CurrentPrice(self, obj):
-        return "%.2f" % obj.Symbol.CurrentPrice()
-        
-    def shares(self, obj):
-        return "%.2f" % obj.shares()
-        
-    def control(self, obj):
-        return "%.2f" % obj.aim.control
-    
-    def buyamount(self, obj):
-        return "%.2f" % obj.aim.BuyAmount()
-        
-    def sellamount(self, obj):
-        return "%.2f" % obj.aim.SellAmount()
-    
+    model = Holding
 admin.site.register(Holding, HoldingAdmin)
 
 class HoldingInline(admin.TabularInline):
     model = Holding
 
 class PortfolioAdmin(admin.ModelAdmin):
-    #list_display = ('name', )
-    #list_editable = ('name',)
-    inlines = [ HoldingInline, ]
+    pass
 admin.site.register(Portfolio, PortfolioAdmin)
-
 
 class SymbolAdmin(admin.ModelAdmin):
     pass
-    
 admin.site.register(Symbol, SymbolAdmin)
-
 
 class PriceAdmin(admin.ModelAdmin):
     pass
-
 admin.site.register(Price, PriceAdmin)
 
 class AimAdmin(admin.ModelAdmin):
     pass
-admin.site.register(AimStandard, AimAdmin)
+admin.site.register(AimController, AimAdmin)
 
-
+class AlertAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(HoldingAlert, AlertAdmin)

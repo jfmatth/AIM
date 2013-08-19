@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 import csv
 import datetime
 
-
 """
 Loads a CSV file into the stock and price tables from EODDATA
 """
@@ -88,8 +87,4 @@ def EOD_LoadSymbols(filename):
 
 
 
-if __file__=="__main__":
-    import sys
-
-    main(sys.argv[1])
 

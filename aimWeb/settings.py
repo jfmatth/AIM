@@ -13,7 +13,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -65,6 +64,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    "c:/users/john/development/bootstrap.v231/",
 )
 
 # List of finder classes that know how to find static files in
