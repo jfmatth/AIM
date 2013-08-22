@@ -19,7 +19,7 @@ class PortfolioAdmin(admin.ModelAdmin):
 admin.site.register(Portfolio, PortfolioAdmin)
 
 class SymbolAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name']
 admin.site.register(Symbol, SymbolAdmin)
 
 class PriceAdmin(admin.ModelAdmin):

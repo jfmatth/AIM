@@ -1,13 +1,10 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic import TemplateView
 
-class BootstrapSampleView(TemplateView):
-    template_name = "sample.html"
-    
-
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
+
 
 urlpatterns = patterns('',
     # Examples:
@@ -20,9 +17,10 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
     
-    url(r'^bootstrap/', BootstrapSampleView.as_view()),
+    url(r'^loader/exchange', 'loader.views.LoadExchange'),
+    url(r'^loader/prices',   'loader.views.LoadPrices'),
     
-    #url(r'^aim/', include(aim.urls) ),
+    url(r'^aim/', include('aim.urls') ),
     
     url(r'^$', TemplateView.as_view(template_name = "index.html") ),
     

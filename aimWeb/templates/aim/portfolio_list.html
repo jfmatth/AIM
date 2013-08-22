@@ -1,55 +1,55 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "bootstrap.html" %}
 
-<!-- portfolio_list.html -->
-
-{% if object_list %}
-    <h1>Portfolio List</h1>{% if user.is_authenticated %}
-    <p>    <a href="/aim/portfolio/add"> Add a Portfolio </a>
-{% endif %}
-
-    {% for p in object_list %}
-        <table border=1>
-        <tr>
-            <th><a href="/aim/portfolio/edit/{{p.id}}"> {{p}} </a></th>
-            <td><a href="/aim/holding/add?portfolio={{p.id}}">Add Holding </a> </td>
-        </tr>
-
-        <tr>
-            <th>Holding</th>
-            <th>Value</th>
-            <th>Current Price</th>
-            <th>Action(B/S) </th>
-            <th></th>
-            <th>Next Buy</th>
-            <th>Next Sell</th>
-        </tr>
-        {% for h in p.holding_set.all %}
-        <tr>
-            <td>{{ h.stock }}</td>
-            <td>{{ h.value }}</td>
-            <td>{{ h.stock.CurrentPrice|stringformat:".2f" }}</td>
-            <td>{{ h.aim.BuyAmount}} / {{h.aim.SellAmount}}</td>
-            <td></td>
-            <td> {{h.aim.BuyPrice|stringformat:".2f"}}</td>
-            <td> {{h.aim.SellPrice|stringformat:".2f"}}</td>
-        </tr>
-        {% endfor %}
-        </table>
-        <br>
-    {% endfor %}
-   
-{% endif %}
-
-
-
-{% if public_list %}
-    <h1> Public Portfoliios </h1>
-    {% for p in public_list %}
-        {{p}} <br>
-    {% endfor %}
-
-{% endif %}
-
+{% block body %}
+	<!-- portfolio_list.html -->
+	
+	{% if object_list %}
+		<h1>Portfolio List</h1>    {% if user.is_authenticated %}
+	    <p>    <a href="/aim/portfolio/add"> Add a Portfolio </a>
+	{% endif %}
+	
+	    {% for p in object_list %}
+	        <table border=1>
+	        <tr>
+	            <th><a href="/aim/portfolio/edit/{{p.id}}"> {{p}} </a></th>
+	            <td><a href="/aim/holding/add?portfolio={{p.id}}">Add Holding </a> </td>
+	        </tr>
+	
+	        <tr>
+	            <th>Holding</th>
+	            <th>Value</th>
+	            <th>Current Price</th>
+	            <th>Action(B/S) </th>
+	            <th></th>
+	            <th>Next Buy</th>
+	            <th>Next Sell</th>
+	        </tr>
+	        {% for h in p.holding_set.all %}
+	        <tr>
+	            <td>{{ h.stock }}</td>
+	            <td>{{ h.value }}</td>
+	            <td>{{ h.stock.CurrentPrice|stringformat:".2f" }}</td>
+	            <td>{{ h.aim.BuyAmount}} / {{h.aim.SellAmount}}</td>
+	            <td></td>
+	            <td> {{h.aim.BuyPrice|stringformat:".2f"}}</td>
+	            <td> {{h.aim.SellPrice|stringformat:".2f"}}</td>
+	        </tr>
+	        {% endfor %}
+	        </table>
+	        <br>
+	    {% endfor %}
+	   
+	{% endif %}
+	
+	
+	
+	{% if public_list %}
+	    <h1> Public Portfoliios </h1>
+	    {% for p in public_list %}
+	        {{p}} <br>
+	    {% endfor %}
+	
+	{% endif %}
+	
 
 {% endblock %}

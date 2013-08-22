@@ -2,8 +2,11 @@
  
 from django.conf.urls.defaults import *
 
+from aim.views import IndexView
+
 urlpatterns = patterns('',
-    (r'^$',                                         'aim.views.index'),
+#    (r'^$',                                         'aim.views.index'),
+    (r'^$', IndexView.as_view() ),
 
     (r'^login/$',                                   'aim.views.aim_login'),
 

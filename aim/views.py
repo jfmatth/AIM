@@ -1,7 +1,13 @@
 from django.http import HttpResponse, HttpResponseRedirect
 
-from django.views.generic.list_detail import object_list, object_detail
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView, ListView
+
+
+from aim.models import Portfolio
+
+
+# from django.views.generic.list_detail import object_list, object_detail
+# from django.views.generic.simple import direct_to_template
 from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -9,24 +15,31 @@ from django.http import Http404
 from aim.models import *
 from aim.forms import *
 
-def index(request):
-    if request.user.is_authenticated():
-        qs = Portfolio.objects.filter(owner=request.user)    
-        # create a queryset of all public portfolios that I don't own.
-        qs_public = Portfolio.objects.filter(permission = "V").exclude(owner=request.user)
-    else:
-        qs = Portfolio.objects.none()
-        qs_public = Portfolio.objects.filter(permission = "V")
-        
-    template="aim/portfolio_list.html"
-    
-    return object_list(request,
-                       queryset = qs,
-                       template_name = template,
-                       allow_empty=True,
-                       extra_context={'public_list' : qs_public,},
-                    )
+# def index(request):
+#     if request.user.is_authenticated():
+#         qs = Portfolio.objects.filter(owner=request.user)    
+#         # create a queryset of all public portfolios that I don't own.
+#         qs_public = Portfolio.objects.filter(permission = "V").exclude(owner=request.user)
+#     else:
+#         qs = Portfolio.objects.none()
+#         qs_public = Portfolio.objects.filter(permission = "V")
+#         
+#     template="aim/portfolio_list.html"
+#     
+#     return object_list(request,
+#                        queryset = qs,
+#                        template_name = template,
+#                        allow_empty=True,
+#                        extra_context={'public_list' : qs_public,},
+#                     )
 
+class IndexView(ListView):
+    
+    def get_queryset(self):
+        return Portfolio.objects.filter(owner=self.request.user)
+    
+    template_name = "aim/portfolio_list.html"
+    context_object_name = "object_list"
 #
 #
 # Portofolio's

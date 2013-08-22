@@ -1,7 +1,5 @@
 
-import settings
-
-from util.loadcsv import EOD_LoadPrices, EOD_LoadSymbols
+from loadcsv import EOD_LoadPrices, EOD_LoadSymbols
 
 import os
 
@@ -39,4 +37,6 @@ def main():
             os.remove(fullpath)
 
 if __name__ == "__main__":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aimWeb.settings")
+
     main()

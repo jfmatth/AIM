@@ -8,7 +8,6 @@ import datetime
 Loads a CSV file into the stock and price tables from EODDATA
 """
 
-
 def EOD_LoadPrices(filename):
     import os
 

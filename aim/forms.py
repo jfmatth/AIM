@@ -11,4 +11,3 @@ class HoldingForm(ModelForm):
     
     class Meta:
         model = Holding
-        fields = ['stock', 'portfolio',]       

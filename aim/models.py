@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
+# from django.core.exceptions import ObjectDoesNotExist
 
-import datetime
+# import datetime
 from decimal import Decimal
 
 # import util.aim_utilities
@@ -13,18 +13,14 @@ from decimal import Decimal
 class Symbol(models.Model):
     name        = models.CharField(max_length=10, unique=True, db_index=True)
     description = models.CharField(max_length=50, blank=True)
+    currentprice = models.OneToOneField('Price', related_name = "currentprice", null=True)
 
     def __unicode__(self):
         return self.name
+    
+    class Meta:
+        ordering = ["name"]
 
-    def CurrentPrice(self):
-        try:
-            #figure out what the last price was.
-            return self.price_set.all()[0].close
-        except:
-            # and if we don't have any prices, just return 0 for now.
-            return 0
-                        
 #===============================================================================
 # Price - Stock price 1-N back to Symbol
 #===============================================================================
@@ -81,7 +77,11 @@ class Holding(models.Model):
         return s
     
     def value(self):
-        return self.shares() * self.symbol.CurrentPrice()
+        return self.shares() * self.symbol.currentprice.close
+    
+    # return the last holding alert for this holding.
+    def currentalert(self):
+        return self.holdingalert_set.latest('created')
             
 #===============================================================================
 # HoldingAlert - A static version of what the next buy / sell prices will 
@@ -91,6 +91,7 @@ class Holding(models.Model):
 class HoldingAlert(models.Model):
     holding = models.ForeignKey(Holding)
     
+    created   = models.DateTimeField(auto_now_add=True, null=True, verbose_name="Date Created")
     buyprice  = models.DecimalField(max_digits=10, decimal_places=3)
     sellprice = models.DecimalField(max_digits=10, decimal_places=3)
 
@@ -101,8 +102,9 @@ class HoldingAlert(models.Model):
         if self.id == None:
             self.buyprice = self.holding.controller.BuyPrice()
             self.sellprice = self.holding.controller.SellPrice()
-            
-        super(HoldingAlert, self).save(force_insert, force_update)
+
+        if self.buyprice > 0:
+            super(HoldingAlert, self).save(force_insert, force_update)
         
 
 #===============================================================================
@@ -114,9 +116,9 @@ class AimBase(models.Model):
     started   = models.BooleanField()                   # is the program started?
     control   = models.IntegerField(default=0)           # Portfolio Control
     sellsafe  = models.IntegerField(default=10)          # SAFE for sales, a percentage value
-    sellmin   = models.IntegerField(default=500)         # Minimum to sell in a transaction
     buysafe   = models.IntegerField(default=10)          # SAFE for buys
     buymin    = models.IntegerField(default=500)         # Minimum to buy
+    sellmin   = models.IntegerField(default=500)         # Minimum to sell in a transaction
             
     # Holy Shit! I just figure out the forumla I've been using hasn't been right, and missed these figures
     # they are the percentage of value to buy / sell each time, instead of the fixed values above (buyin/sellmin).
@@ -129,13 +131,13 @@ class AimBase(models.Model):
     
     def BuyPrice(self):
         return Decimal(0)
-    def BuyAmount(self):
-        return Decimal(0)
-            
     def SellPrice(self):
         return Decimal(0)
-    def SellAmount(self):
-        return Decimal(0)
+
+#     def BuyAmount(self):
+#         return Decimal(0)
+#     def SellAmount(self):
+#         return Decimal(0)
             
     def transaction(self, transaction=None):
         return Decimal(0)
@@ -161,7 +163,7 @@ class AimController(AimBase):
             
             pc = Decimal(self.control)
             N  = Decimal(self.holding.shares())
-            ss = Decimal(self.sellsafe) / Decimal(100)
+#             ss = Decimal(self.sellsafe) / Decimal(100)
             bs = Decimal(self.buysafe) / Decimal(100)
                 
             return (pc - bm) / (N * ( Decimal(1) + bs) )
@@ -169,16 +171,16 @@ class AimController(AimBase):
         else:
             return Decimal(0)
 
-    def BuyAmount(self):
-        # Normal AIM formula for buy amount is
-        #
-        # PC - (Current Value + (Safe * Current value) )
-        #
-        amount = self.control - (self.holding.value() + (self.buysafe / Decimal(100) * self.holding.value()) )
-        if amount > 0:
-            return amount
-        else:
-            return 0            
+#     def BuyAmount(self):
+#         # Normal AIM formula for buy amount is
+#         #
+#         # PC - (Current Value + (Safe * Current value) )
+#         #
+#         amount = self.control - (self.holding.value() + (self.buysafe / Decimal(100) * self.holding.value()) )
+#         if amount > 0:
+#             return amount
+#         else:
+#             return 0            
                     
     def SellPrice(self):                
         if self.control <> 0:
@@ -189,22 +191,22 @@ class AimController(AimBase):
             pc = Decimal(self.control)
             N  = Decimal(self.holding.shares() )
             ss = Decimal(self.sellsafe) / Decimal(100)
-            bs = Decimal(self.buysafe) / Decimal(100)
+#             bs = Decimal(self.buysafe) / Decimal(100)
             
             return (pc + sm) / (N * ( Decimal(1) - ss) )
         else:
             return Decimal(0)
                     
-    def SellAmount(self):
-        # Normal AIM formula for sell amount is
-        #
-        #  PC + (Safe * Current value) - Current Value
-        #
-        amount = self.control + (self.sellsafe / Decimal(100) * self.holding.value() ) - self.holding.value()
-        if amount < 0 :
-            return amount
-        else:
-            return 0
+#     def SellAmount(self):
+#         # Normal AIM formula for sell amount is
+#         #
+#         #  PC + (Safe * Current value) - Current Value
+#         #
+#         amount = self.control + (self.sellsafe / Decimal(100) * self.holding.value() ) - self.holding.value()
+#         if amount < 0 :
+#             return amount
+#         else:
+#             return 0
 
 
     def transaction(self, transaction=None):
@@ -221,7 +223,7 @@ class AimController(AimBase):
         
 #             # now add a holding alert for the changes.
 #             HoldingAlert(holding=self.holding).save()
-            
+           
             
     def save(self, force_insert=False, force_update=False):
         super(AimController, self).save(force_insert, force_update)
@@ -234,6 +236,8 @@ class AimController(AimBase):
 #             alert.buyprice = self.BuyPrice()
 #             alert.sellprice = self.SellPrice()
 #             alert.save()
+
+        # Add a holding alert for this change to our AIM settings
         HoldingAlert(holding=self.holding).save()
         
 
