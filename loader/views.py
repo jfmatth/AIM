@@ -3,12 +3,17 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.db import transaction
 
-from aim.models import Symbol, Price
-from loader.models import Exchange, ExchangePrice
-
+import logging
 import csv
 import datetime
 
+from aim.models import Symbol, Price
+from loader.models import Exchange, ExchangePrice
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
+@transaction.commit_on_success
 def ImportPrices(f):
     """
     Import a file f into the prices table.
@@ -53,7 +58,6 @@ def ImportPrices(f):
         except:
             print "Problem with %s" % csvline 
         
-@transaction.commit_on_success
 def LoadPrices(request):
 
     count = 0    
@@ -70,6 +74,7 @@ def LoadPrices(request):
     return HttpResponse("Loaded %s Prices" % count)
 
 
+@transaction.commit_on_success
 def ImportExchange(f):
     dialect = csv.Sniffer().sniff( f.read(1024) )
     f.seek(0)
@@ -84,24 +89,21 @@ def ImportExchange(f):
         # assume all the records are here and the exceptions add them
         try:
             Symbol(name = csvline[0],description = csvline[1]).save()
-        except Exception as e:
-            print "problem on %s %e" % (csvline, e)
+        except:
+            print "problem on %s" % (csvline)
 
-@transaction.commit_on_success
 def LoadExchange(request):
+    logger.info("Load Exchange()")
     count = 0
     
     for e in Exchange.objects.filter(loaded=False):
         # we have an exchange that hasn't been loaded.
         
         # sniff it out and load it into Symbols.
-        try:
-            ImportExchange(e.file)
-    
-            e.loaded = True
-            e.save()
-        except:
-            return HttpResponse("Exception")
+        ImportExchange(e.file)
+
+        e.loaded = True
+        e.save()
         
         count += 1
 

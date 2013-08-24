@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
+
 # from django.core.exceptions import ObjectDoesNotExist
 
 # import datetime
@@ -13,7 +15,13 @@ from decimal import Decimal
 class Symbol(models.Model):
     name        = models.CharField(max_length=10, unique=True, db_index=True)
     description = models.CharField(max_length=50, blank=True)
-    currentprice = models.OneToOneField('Price', related_name = "currentprice", null=True)
+    currentprice = models.OneToOneField('Price', 
+                                        related_name = "pricelink", 
+                                        null=True, blank=True,
+                                        # have to add DO_NOTHING, was cascading thru to 
+                                        # the holding and everything else.
+                                        on_delete=models.DO_NOTHING,
+                                        )
 
     def __unicode__(self):
         return self.name
@@ -50,13 +58,19 @@ class Portfolio(models.Model):
     
     def __unicode__(self):
         return self.name
-            
+
+
 #===============================================================================
 # Holding - A stock symbol in a portfolio
 #===============================================================================
 class Holding(models.Model):
     portfolio    = models.ForeignKey(Portfolio)
-    symbol       = models.ForeignKey(Symbol)
+    symbol       = models.OneToOneField(Symbol)
+    currentalert = models.OneToOneField('HoldingAlert',
+                                        related_name="alertholding",
+                                        blank=True, null=True,
+                                        on_delete=models.DO_NOTHING,
+                                        )
     
     def save(self, force_insert=False, force_update=False):
         if self.id == None:
@@ -79,9 +93,6 @@ class Holding(models.Model):
     def value(self):
         return self.shares() * self.symbol.currentprice.close
     
-    # return the last holding alert for this holding.
-    def currentalert(self):
-        return self.holdingalert_set.latest('created')
             
 #===============================================================================
 # HoldingAlert - A static version of what the next buy / sell prices will 
@@ -105,7 +116,9 @@ class HoldingAlert(models.Model):
 
         if self.buyprice > 0:
             super(HoldingAlert, self).save(force_insert, force_update)
-        
+            self.holding.currentalert = self
+            self.holding.save()
+            
 
 #===============================================================================
 # AimBase - Base class for all transaction controllers
@@ -228,15 +241,6 @@ class AimController(AimBase):
     def save(self, force_insert=False, force_update=False):
         super(AimController, self).save(force_insert, force_update)
         
-        # if the user changes the controller settings, recalc the alert
-#         if self.id != None:
-#             # but not if this is the first record, because the transaction will do that.
-#             alert = HoldingAlert()
-#             alert.holding = self.holding
-#             alert.buyprice = self.BuyPrice()
-#             alert.sellprice = self.SellPrice()
-#             alert.save()
-
         # Add a holding alert for this change to our AIM settings
         HoldingAlert(holding=self.holding).save()
         

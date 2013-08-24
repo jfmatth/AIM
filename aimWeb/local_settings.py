@@ -7,7 +7,7 @@ SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'aimweb.sqlite.db',
+        'NAME': 'database-sqlite.db',
     }
 }
  
@@ -25,3 +25,5 @@ TEMPLATE_DIRS = (
     os.path.join(SITE_ROOT, 'templates')
 )
 
+
+# django logging, taken from docs
