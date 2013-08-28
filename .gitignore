@@ -1,4 +1,5 @@
 data/
+local_settings.py
 *.sq3
 *.db
 *.pyc
@@ -6,3 +7,4 @@ data/
 .pydevproject
 manage.py
 .settings
+activate.bat

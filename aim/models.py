@@ -147,10 +147,10 @@ class AimBase(models.Model):
     def SellPrice(self):
         return Decimal(0)
 
-#     def BuyAmount(self):
-#         return Decimal(0)
-#     def SellAmount(self):
-#         return Decimal(0)
+    def BuyAmount(self):
+        return Decimal(0)
+    def SellAmount(self):
+        return Decimal(0)
             
     def transaction(self, transaction=None):
         return Decimal(0)
@@ -184,16 +184,16 @@ class AimController(AimBase):
         else:
             return Decimal(0)
 
-#     def BuyAmount(self):
-#         # Normal AIM formula for buy amount is
-#         #
-#         # PC - (Current Value + (Safe * Current value) )
-#         #
-#         amount = self.control - (self.holding.value() + (self.buysafe / Decimal(100) * self.holding.value()) )
-#         if amount > 0:
-#             return amount
-#         else:
-#             return 0            
+    def BuyAmount(self):
+        # Normal AIM formula for buy amount is
+        #
+        # PC - (Current Value + (Safe * Current value) )
+        #
+        amount = self.control - (self.holding.value() + (self.buysafe / Decimal(100) * self.holding.value()) )
+        if amount > 0:
+            return amount
+        else:
+            return 0            
                     
     def SellPrice(self):                
         if self.control <> 0:
@@ -210,16 +210,16 @@ class AimController(AimBase):
         else:
             return Decimal(0)
                     
-#     def SellAmount(self):
-#         # Normal AIM formula for sell amount is
-#         #
-#         #  PC + (Safe * Current value) - Current Value
-#         #
-#         amount = self.control + (self.sellsafe / Decimal(100) * self.holding.value() ) - self.holding.value()
-#         if amount < 0 :
-#             return amount
-#         else:
-#             return 0
+    def SellAmount(self):
+        # Normal AIM formula for sell amount is
+        #
+        #  PC + (Safe * Current value) - Current Value
+        #
+        amount = self.control + (self.sellsafe / Decimal(100) * self.holding.value() ) - self.holding.value()
+        if amount < 0 :
+            return amount
+        else:
+            return 0
 
 
     def transaction(self, transaction=None):

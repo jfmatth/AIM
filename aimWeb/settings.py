@@ -115,7 +115,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'aim',
-    'loader', 
+    'loader',
+    'registration', 
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -177,6 +178,14 @@ LOGGING = {
         },
     }
 }
+
+#django registration 
+ACCOUNT_ACTIVATION_DAYS = 2
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 
 
 try:
