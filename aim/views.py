@@ -1,179 +1,79 @@
-from django.http import HttpResponse, HttpResponseRedirect
+#from django.http import HttpResponse, HttpResponseRedirect
+from django.views.generic import ListView
+from django import forms
 
-from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import CreateView, UpdateView
+from django.core.exceptions import ObjectDoesNotExist
 
+from aim.models import Portfolio, Holding, Symbol
 
-from aim.models import Portfolio
+#===============================================================================
+# MainView for /aim
+#===============================================================================
+class MainView(ListView):
+    """
+    This is the main screen a logged in user sees for all their holdings and portfolios.
+    """
+    template_name = "aim/MainView.html"
+    context_object_name = "object_list"
 
-
-# from django.views.generic.list_detail import object_list, object_detail
-# from django.views.generic.simple import direct_to_template
-from django.contrib.auth import authenticate, login
-from django.shortcuts import get_object_or_404
-from django.http import Http404
-
-from aim.models import *
-from aim.forms import *
-
-# def index(request):
-#     if request.user.is_authenticated():
-#         qs = Portfolio.objects.filter(owner=request.user)    
-#         # create a queryset of all public portfolios that I don't own.
-#         qs_public = Portfolio.objects.filter(permission = "V").exclude(owner=request.user)
-#     else:
-#         qs = Portfolio.objects.none()
-#         qs_public = Portfolio.objects.filter(permission = "V")
-#         
-#     template="aim/portfolio_list.html"
-#     
-#     return object_list(request,
-#                        queryset = qs,
-#                        template_name = template,
-#                        allow_empty=True,
-#                        extra_context={'public_list' : qs_public,},
-#                     )
-
-class IndexView(ListView):
-    
     def get_queryset(self):
         return Portfolio.objects.filter(owner=self.request.user)
-    
-    template_name = "aim/portfolio_list.html"
-    context_object_name = "object_list"
-#
-#
+
+#===============================================================================
 # Portofolio's
-#
-#    
-def portfolio(request, portfolio_id):
-    return HttpResponse("View portfolio %s" % str(portfolio_id) )
+#===============================================================================
+class PortfolioForm(forms.ModelForm):
+    class Meta:
+        model = Portfolio
+        exclude = ('owner',)    
+
+class PortfolioUpdate(UpdateView):
+    model = Portfolio
+    success_url = "/aim/"
+    form_class = PortfolioForm
+
+class PortfolioCreate(CreateView):
+    model = Portfolio
+    form_class = PortfolioForm
     
-def portfolio_add(request):
+#     template_name = 'aim/portfolio_add.html'
+    success_url = "/aim/"
 
-    # need to add Login_required stuff.
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super(PortfolioCreate, self).form_valid(form)
 
-    if request.method == 'POST':
-        form = PortfolioForm(request.POST) 
-        if form.is_valid():            
-            p = form.save(commit=False)
-            p.owner = request.user
-            p.save()
-            
-            return HttpResponseRedirect('/aim/') 
-    else:
-        form = PortfolioForm()
+#===============================================================================
+# Holding's (forms and views)
+#===============================================================================
+class HoldingForm(forms.ModelForm):
+    # define symbol here to override the default ModelChoicefield dropdown list.
+    symbol = forms.CharField()
 
-    return direct_to_template(request,
-                              template='aim/portfolio_add.html',
-                              extra_context = {'form' : form },
-                            )
-    
-def portfolio_edit(request, portfolio_id):
-    p = get_object_or_404(Portfolio, pk=portfolio_id)
-
-    # make sure we own this portfolio
-    if p.owner != request.user:
-        raise Http404
-
-    if request.method == 'POST':
-        # find the portfolio in question
-        form = PortfolioForm(request.POST, instance=p)
-        if form.is_valid():
-            form.save()
-            
-            return HttpResponseRedirect('/aim/')
-    else:
-        form = PortfolioForm(instance=p)
-    
-    return direct_to_template(request,
-                              template='aim/portfolio_add.html',
-                              extra_context = {'form': form }
-                            )
-
-#
-#
-# Holdings
-#
-#
-def holding_all(request):
-    # show all holdings for a particular user    
-    qs = Holding.objects.filter(portfolio__owner = request.user)
-
-    return object_list(request,
-                       queryset = qs,
-                       template_name = 'aim/holding_all.html',
-                       allow_empty=True,
-                    )
-#
-# holding - show the detail of a holding
-#
-def holding(request, holding_id):
-    obj = get_object_or_404(Holding, pk=holding_id)
-    
-    if obj.portfolio.owner != request.user:
-        raise Http404
-
-    return object_detail(request,
-                         Holding.objects.all(),
-                         object_id=holding_id,
-                         template_name="aim/holding.html",
-                        )
-    
-def holding_edit(request, holding_id):
-    return HttpResponse("Edit Holding %s" % str(holding_id) )
-
-def holding_add(request):
-    # check to see if any parameters were passed
-    port = None
-    
-    if "portfolio" in request.REQUEST:
-        # first, can we find the portfolio in question
-        port = get_object_or_404(Portfolio, pk=request.REQUEST['portfolio'])
+    def __init__(self, *args, **kwargs):
+        super(HoldingForm,self).__init__(*args, **kwargs)
+        # only show the portfolios for this user.
+        self.fields['portfolio'].queryset = Portfolio.objects.filter(owner=self.initial['user'] )
         
-        # and do we own this portfolio?
-        if port.owner != request.user:
-            raise Http404
-    else:
-        raise Http404
-    
-    if request.method == 'POST':
-        form = HoldingForm(request.POST,)
-        
-        if form.is_valid():
-            h = form.save()
-            
-            # jfm - add a AimValue control parameter record 1-1
-            #av = Aim()
-            #av.holding = h
-            #av.save()            
-            
-            return HttpResponseRedirect('/aim/holding/%s' % str(h.id) )
-    else:
-        form = HoldingForm(initial={'portfolio':port.id})
-        form['portfolio'].field.queryset = Portfolio.objects.filter(owner = request.user)
-    
-    return direct_to_template(request,
-                              template='aim/holding_add.html',
-                              extra_context = {'form': form }
-                            )
+    def clean_symbol(self):
+        # Since symbol needs to be a symbol object, use the clean
+        # method to make sure it's valid, and if it is, return a symbol object, not the text.
+        try:
+            return Symbol.objects.get(name=self.cleaned_data['symbol'])
+        except:
+            raise forms.ValidationError("Invalid symbol")
 
-#
-#
-# Misc. Functions
-#
-#
-def aim_login(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
-            login(request, user)
-            return HttpResponseRedirect('/')
-        else:
-            return HttpResponseRedirect('/')
-            # Return a 'disabled account' error message
-    else:
-        return HttpResponseRedirect('/')
+    class Meta:
+        model = Holding
+        fields = ('symbol', 'portfolio' )
 
+class HoldingCreate(CreateView):
+    model = Holding
+    form_class = HoldingForm
+    success_url = "/aim/"
 
+    def get_initial(self):
+        # save the user object for use in the Form
+        self.initial.update( {'user' : self.request.user} )
+        return super(HoldingCreate,self).get_initial()

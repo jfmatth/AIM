@@ -13,7 +13,7 @@ from decimal import Decimal
 # Symbol - Stock Symbol
 #===============================================================================
 class Symbol(models.Model):
-    name        = models.CharField(max_length=10, unique=True, db_index=True)
+    name        = models.CharField(max_length=10, db_index=True)
     description = models.CharField(max_length=50, blank=True)
     currentprice = models.OneToOneField('Price', 
                                         related_name = "pricelink", 
@@ -53,7 +53,7 @@ portfolio_perms=(
 )
 class Portfolio(models.Model):
     name  = models.CharField(max_length=50)
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, blank=True)
     permission = models.CharField(max_length=10, choices=portfolio_perms, default="X")              
     
     def __unicode__(self):
@@ -65,7 +65,7 @@ class Portfolio(models.Model):
 #===============================================================================
 class Holding(models.Model):
     portfolio    = models.ForeignKey(Portfolio)
-    symbol       = models.OneToOneField(Symbol)
+    symbol       = models.ForeignKey(Symbol)
     currentalert = models.OneToOneField('HoldingAlert',
                                         related_name="alertholding",
                                         blank=True, null=True,
@@ -91,8 +91,13 @@ class Holding(models.Model):
         return s
     
     def value(self):
-        return self.shares() * self.symbol.currentprice.close
-    
+        if self.symbol.currentprice:
+            return self.shares() * self.symbol.currentprice.close
+        else:
+            return 0
+
+    class Meta:
+        unique_together = ('portfolio', 'symbol')
             
 #===============================================================================
 # HoldingAlert - A static version of what the next buy / sell prices will 

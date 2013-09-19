@@ -1,18 +1,15 @@
 {% extends "bootstrap.html" %}
-
 {% block body %}
-	<!-- portfolio_list.html -->
-	
+	<!-- MainView.html -->
 	{% if object_list %}
 		<h1>Portfolio List</h1>    {% if user.is_authenticated %}
-	    <p>    <a href="/aim/portfolio/add"> Add a Portfolio </a>
+	    <p>    <a href="{% url "portfolio_add" %}"> Add a Portfolio </a>
 	{% endif %}
 	
 	    {% for p in object_list %}
 	        <table border=1>
 	        <tr>
-	            <th><a href="/aim/portfolio/edit/{{p.id}}"> {{p}} </a></th>
-	            <td><a href="/aim/holding/add?portfolio={{p.id}}">Add Holding </a> </td>
+	            <th>edit:<a href="{% url "portfolio_edit" p.id %}"> {{p}} </a></th>
 	        </tr>
 	
 	        <tr>
@@ -26,16 +23,18 @@
 	        </tr>
 	        {% for h in p.holding_set.all %}
 	        <tr>
-	            <td>{{ h.stock }}</td>
+	            <td>{{ h.symbol }}</td>
 	            <td>{{ h.value }}</td>
-	            <td>{{ h.stock.CurrentPrice|stringformat:".2f" }}</td>
-	            <td>{{ h.aim.BuyAmount}} / {{h.aim.SellAmount}}</td>
+	            <td>{{ h.symbol.currentprice.close }}</td>
+	            <td> </td>
 	            <td></td>
-	            <td> {{h.aim.BuyPrice|stringformat:".2f"}}</td>
-	            <td> {{h.aim.SellPrice|stringformat:".2f"}}</td>
+	            <td> {{ h.currentalert.buyprice }} </td>
+	            <td> {{ h.currentalert.sellprice }}</td>
 	        </tr>
 	        {% endfor %}
+	        <td><a href="{% url "holding_addplain" %} ">Add Holding </a> </td>
 	        </table>
+	        
 	        <br>
 	    {% endfor %}
 	   
