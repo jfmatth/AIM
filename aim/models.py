@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Q
 
 # from django.core.exceptions import ObjectDoesNotExist
 
 # import datetime
 from decimal import Decimal
+import logging
+
+log = logging.getLogger(__name__)
 
 # import util.aim_utilities
 
@@ -58,7 +60,9 @@ class Portfolio(models.Model):
     
     def __unicode__(self):
         return self.name
-
+    
+    class Meta:
+        unique_together = ('name', 'owner')
 
 #===============================================================================
 # Holding - A stock symbol in a portfolio
@@ -73,6 +77,7 @@ class Holding(models.Model):
                                         )
     
     def save(self, force_insert=False, force_update=False):
+        log.debug("Holding.Save()")
         if self.id == None:
             # New record, so lets save a new Controller record too.
             super(Holding, self).save(force_insert, force_update)
@@ -95,9 +100,10 @@ class Holding(models.Model):
             return self.shares() * self.symbol.currentprice.close
         else:
             return 0
-
+        
     class Meta:
-        unique_together = ('portfolio', 'symbol')
+        unique_together = ("portfolio", "symbol")
+
             
 #===============================================================================
 # HoldingAlert - A static version of what the next buy / sell prices will 
@@ -106,7 +112,7 @@ class Holding(models.Model):
 #===============================================================================
 class HoldingAlert(models.Model):
     holding = models.ForeignKey(Holding)
-    
+
     created   = models.DateTimeField(auto_now_add=True, null=True, verbose_name="Date Created")
     buyprice  = models.DecimalField(max_digits=10, decimal_places=3)
     sellprice = models.DecimalField(max_digits=10, decimal_places=3)
@@ -115,15 +121,17 @@ class HoldingAlert(models.Model):
         return "%s b:%s s:%s" % (self.holding, self.buyprice,self.sellprice)
 
     def save(self, force_insert=False, force_update=False):
+        log.debug("Save() in Holdingalert")
         if self.id == None:
             self.buyprice = self.holding.controller.BuyPrice()
             self.sellprice = self.holding.controller.SellPrice()
 
-        if self.buyprice > 0:
-            super(HoldingAlert, self).save(force_insert, force_update)
-            self.holding.currentalert = self
-            self.holding.save()
-            
+        super(HoldingAlert,self).save(force_insert, force_update)
+
+#         if self.buyprice > 0:
+        self.holding.currentalert = self
+        self.holding.save()
+
 
 #===============================================================================
 # AimBase - Base class for all transaction controllers
@@ -228,6 +236,7 @@ class AimController(AimBase):
 
 
     def transaction(self, transaction=None):
+        log.debug("AimController.transaction")
         if transaction.total() > 0:
             if not self.started:
                     # we can assume a control of 0 means its not started ?
@@ -236,19 +245,22 @@ class AimController(AimBase):
             else:
                     # otherwise we only add 1/2 to the control
                     self.control += transaction.total() / 2
+                    
             self.started = True
             self.save()
         
-#             # now add a holding alert for the changes.
-#             HoldingAlert(holding=self.holding).save()
+            # now add a holding alert for the changes.
+            HoldingAlert(holding=self.holding).save()
            
             
     def save(self, force_insert=False, force_update=False):
+        log.debug("AimController.save()")
         super(AimController, self).save(force_insert, force_update)
         
-        # Add a holding alert for this change to our AIM settings
-        HoldingAlert(holding=self.holding).save()
-        
+#         # Add a holding alert for this change to our AIM settings
+#         ha = HoldingAlert()
+#         ha.holding = self.holding
+#         ha.save()
 
     def __unicode__(self):
         return "%s (%s)" % (self.holding, self.control)
@@ -265,36 +277,12 @@ class Transaction(models.Model):
 
     def __unicode__(self):
         return "%s %s (%s @ %s)" % (self.holding, self.date, self.shares, self.price)
-            
+
     def total(self):
         return self.shares * self.price
 
     def save(self, force_insert=False, force_update=False):
+        log.debug("Transaction.save()")
         super(Transaction, self).save(force_insert, force_update)
         
         self.holding.controller.transaction(transaction=self)
-
-#===============================================================================
-# AimNone - A base transaction controller, no AIM, just basic add / subtract from a holding.
-#===============================================================================
-#class AimNone(AimBase):
-#        def __unicode__(self):
-#                return "Base class for Aim"
-#        
-#        def BuyPrice(self):
-#                return Decimal(0)
-#
-#        def BuyAmount(self):
-#                return Decimal(0)
-#                
-#        def SellPrice(self):
-#                return Decimal(0)
-#        
-#        def SellAmount(self):
-#                return Decimal(0)
-#                
-#        def transaction(self, transaction=None):
-#                return Decimal(0)
-#            
-#        class Meta:
-#            proxy = True

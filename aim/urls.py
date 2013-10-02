@@ -3,7 +3,7 @@
 from django.conf.urls.defaults import *
 from django.contrib.auth.decorators import login_required
 
-from aim.views import MainView, PortfolioUpdate, PortfolioCreate, HoldingCreate
+from aim.views import MainView, PortfolioUpdate, PortfolioCreate, HoldingCreate, TransactionCreate
 
 urlpatterns = patterns('',
     url(r'^$',
@@ -28,6 +28,10 @@ urlpatterns = patterns('',
     url(r'^holding/add/$',
         login_required(HoldingCreate.as_view()),
         name = "holding_addplain"),
+                       
+    url(r'^transaction/(?P<holding_id>\d+)/$',
+        login_required(TransactionCreate.as_view() ),
+        name = "transaction"),
                        
 #     (r'^portfolio/add/$',                          'aim.views.portfolio_add'),
 #     (r'^portfolio/edit/(?P<portfolio_id>\d+)/$',   'aim.views.portfolio_edit'),

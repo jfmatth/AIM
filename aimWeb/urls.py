@@ -20,6 +20,6 @@ urlpatterns = patterns('',
     
     url(r'^loader/exchange', 'loader.views.LoadExchange'),
     url(r'^loader/prices',   'loader.views.LoadPrices'),
-    
-    
+    url(r'^loader/$', 'loader.views.LoadAll'),
+        
 )

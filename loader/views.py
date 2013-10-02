@@ -6,6 +6,7 @@ from django.db import transaction
 import logging
 import csv
 import datetime
+import StringIO
 
 from aim.models import Symbol, Price
 from loader.models import Exchange, ExchangePrice
@@ -65,7 +66,7 @@ def LoadPrices(request):
         # we have an exchange that hasn't been loaded.
         
         # sniff it out and load it into Symbols.
-        ImportPrices(e.file)
+        ImportPrices( StringIO.StringIO(e.data) )
 
         e.loaded = True
         e.save()
@@ -87,11 +88,12 @@ def ImportExchange(f):
 
     for csvline in reader:
         # assume all the records are here and the exceptions add them
-        try:
-            Symbol(name = csvline[0],description = csvline[1]).save()
-        except:
-            print "problem on %s" % (csvline)
-
+#         try:
+#             Symbol(name = csvline[0],description = csvline[1]).save()
+#         except:
+#             print "problem on %s" % (csvline)
+        Symbol.objects.get_or_create( name = csvline[0],description = csvline[1] )
+        
 def LoadExchange(request):
     logger.info("Load Exchange()")
     count = 0
@@ -100,7 +102,7 @@ def LoadExchange(request):
         # we have an exchange that hasn't been loaded.
         
         # sniff it out and load it into Symbols.
-        ImportExchange(e.file)
+        ImportExchange( StringIO.StringIO(e.data) )
 
         e.loaded = True
         e.save()
@@ -108,3 +110,33 @@ def LoadExchange(request):
         count += 1
 
     return HttpResponse("%s Exchanges Loaded" % count)
+
+def LoadAll(request):
+    logger.info("Load All()")
+    c1 = 0
+    
+    #load any exchanges
+    for e in Exchange.objects.filter(loaded=False):
+        # we have an exchange that hasn't been loaded.
+        
+        # sniff it out and load it into Symbols.
+        ImportExchange( StringIO.StringIO(e.data) )
+
+        e.loaded = True
+        e.save()
+        
+        c1 += 1
+
+    c2 = 0    
+    for e in ExchangePrice.objects.filter(loaded=False):
+        # we have an exchange that hasn't been loaded.
+        
+        # sniff it out and load it into Symbols.
+        ImportPrices( StringIO.StringIO(e.data) )
+
+        e.loaded = True
+        e.save()
+        c2 += 1
+
+    return HttpResponse("%s Exchanges Loaded, %s Prices Loaded" % (c1,c2) )
+    

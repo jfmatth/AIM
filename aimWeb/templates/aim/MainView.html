@@ -1,46 +1,46 @@
 {% extends "bootstrap.html" %}
 {% block body %}
 	<!-- MainView.html -->
-	{% if object_list %}
-		<h1>Portfolio List</h1>    {% if user.is_authenticated %}
+	<h1>Portfolio List</h1>    
+	{% if user.is_authenticated %}
 	    <p>    <a href="{% url "portfolio_add" %}"> Add a Portfolio </a>
 	{% endif %}
 	
-	    {% for p in object_list %}
-	        <table border=1>
-	        <tr>
-	            <th>edit:<a href="{% url "portfolio_edit" p.id %}"> {{p}} </a></th>
-	        </tr>
-	
-	        <tr>
-	            <th>Holding</th>
-	            <th>Value</th>
-	            <th>Current Price</th>
-	            <th>Action(B/S) </th>
-	            <th></th>
-	            <th>Next Buy</th>
-	            <th>Next Sell</th>
-	        </tr>
-	        {% for h in p.holding_set.all %}
-	        <tr>
-	            <td>{{ h.symbol }}</td>
-	            <td>{{ h.value }}</td>
-	            <td>{{ h.symbol.currentprice.close }}</td>
-	            <td> </td>
-	            <td></td>
-	            <td> {{ h.currentalert.buyprice }} </td>
-	            <td> {{ h.currentalert.sellprice }}</td>
-	        </tr>
-	        {% endfor %}
-	        <td><a href="{% url "holding_addplain" %} ">Add Holding </a> </td>
-	        </table>
-	        
-	        <br>
-	    {% endfor %}
-	   
-	{% endif %}
-	
-	
+    {% for p in object_list %}
+        <table border=1>
+        <tr>
+            <th><a href="{% url "portfolio_edit" p.id %}"> {{p}} </a></th>
+        </tr>
+
+        <tr>
+            <th>Holding</th>
+            <th>Value</th>
+            <th>Current Price</th>
+            <th>Action(B/S) </th>
+            <th></th>
+            <th>Next Buy</th>
+            <th>Next Sell</th>
+            <th>Transaction</th>
+        </tr>
+        {% for h in p.holding_set.all %}
+        <tr>
+            <td>{{ h.symbol }}</td>
+            <td>{{ h.value }}</td>
+            <td>{{ h.symbol.currentprice.close }}</td>
+            <td> </td>
+            <td></td>
+            <td> {{ h.currentalert.buyprice }} </td>
+            <td> {{ h.currentalert.sellprice }}</td>
+            <td> <a href="{% url "transaction" h.id %}">Buy </a> </td>
+        </tr>
+        {% endfor %}
+        <td><a href="{% url "holding_add" p.id %} ">Add Holding </a> </td>
+        
+        </table>
+        
+        <br>
+    {% endfor %}
+   
 	
 	{% if public_list %}
 	    <h1> Public Portfoliios </h1>

@@ -18,17 +18,14 @@ class BaseModel(models.Model):
         abstract = True
 
 class Exchange(BaseModel):
-    file = models.FileField(upload_to="data/exchange")
-    exchange = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    data = models.TextField(blank=True, null=True)
     loaded = models.BooleanField()
     
     def __unicode__(self):
-        return "%s - %s" % (basename(self.file.path), self.exchange) 
+        return "%s" % (self.name) 
 
 class ExchangePrice(BaseModel):
     exchange = models.ForeignKey(Exchange)
-    file = models.FileField(upload_to="data/prices")
+    data = models.TextField(blank=True, null=True)
     loaded = models.BooleanField()
-
-    def __unicode__(self):
-        return "%s " % (basename(self.file.path) )
