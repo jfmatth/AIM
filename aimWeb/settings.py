@@ -173,8 +173,8 @@ LOGGING = {
             'propagate': False,
         },
         'loader': {
-            'handlers': ['console', 'logfile'],
-            'level': 'INFO',
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
         },
         'aim': {
             'handlers': ['console', 'logfile'],

@@ -17,9 +17,11 @@ urlpatterns = patterns('',
     (r'^profiles/', include('profiles.urls')),          # django profiles
     
     url(r'^aim/', include('aim.urls') ),
+
+    url(r'loader/', include('loader.urls') ),
     
-    url(r'^loader/exchange', 'loader.views.LoadExchange'),
-    url(r'^loader/prices',   'loader.views.LoadPrices'),
-    url(r'^loader/$', 'loader.views.LoadAll'),
+#     url(r'^loader/exchange', 'loader.views.LoadExchange'),
+#     url(r'^loader/prices',   'loader.views.LoadPrices'),
+#     url(r'^loader/$', 'loader.views.LoadAll'),
         
 )
