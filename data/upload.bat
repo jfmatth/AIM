@@ -1,12 +1,18 @@
 :main
+	:: load all exchanges.
 	FOR %%a IN (*.txt) DO CALL :exchange %%a
+	
+	:: load symbols and prices 
+	curl 127.0.0.1:8000/loader/
+	echo %errorlevel%
 	
 	GOTO :end
 
 :exchange
 	:: upload to server
 	curl -F formdata=@%~1 127.0.0.1:8000/loader/raw/exchange/%~n1
-	
+	echo %errorlevel%
+		
 	:: find all the prices and upload
 	FOR %%b IN (%~n1_*.csv) DO CALL :price %~n1 %%b 
 	
@@ -18,6 +24,7 @@
 :price
 	:: Upload to server (prices)
 	curl -F formdata=@%2 127.0.0.1:8000/loader/raw/prices/%1
+	echo %errorlevel%
 	
 	:: archive
 	MOVE %2 archive\%2

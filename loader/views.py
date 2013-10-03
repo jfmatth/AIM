@@ -123,11 +123,11 @@ def FormExchange(request, exchange):
 
     if request.method == 'POST':
         
-        form = ExchangeForm(request.POST, request.FILES)
+        form = LoaderForm(request.POST, request.FILES)
 
         if form.is_valid():
             # at this point request.FILES has the text we want, load it into a new Exchange record
-            ex = Exchange(name=exchange, data=request.FILES['exchangedata'].read() )
+            ex = Exchange.objects.get_or_create(name=exchange, data=request.FILES['exchangedata'].read() )
             ex.save()
 
             return HttpResponse("Exchange up-Loaded")
@@ -180,7 +180,9 @@ def ExchangeLoader(request, exchange):
 
         if form.is_valid():
             # at this point request.FILES has the text we want, load it into a new Exchange record
-            ex = Exchange(name=exchange, data=request.FILES['formdata'].read() )
+            ex, created = Exchange.objects.get_or_create(name=exchange)
+            ex.data = request.FILES['formdata'].read()
+            ex.loaded = False
             ex.save()
 
             return HttpResponse("Exchange up-Loaded")

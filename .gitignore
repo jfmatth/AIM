@@ -8,3 +8,4 @@ local_settings.py
 manage.py
 .settings
 activate.bat
+*.log

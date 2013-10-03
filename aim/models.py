@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 # Symbol - Stock Symbol
 #===============================================================================
 class Symbol(models.Model):
-    name        = models.CharField(max_length=10, db_index=True)
+    name        = models.CharField(max_length=10, db_index=True, unique=True)
     description = models.CharField(max_length=50, blank=True)
     currentprice = models.OneToOneField('Price', 
                                         related_name = "pricelink", 
@@ -28,9 +28,6 @@ class Symbol(models.Model):
     def __unicode__(self):
         return self.name
     
-    class Meta:
-        ordering = ["name"]
-
 #===============================================================================
 # Price - Stock price 1-N back to Symbol
 #===============================================================================

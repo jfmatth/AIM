@@ -1,7 +1,5 @@
 from django.db import models
 
-from os.path import basename 
-
 # Create your models here.
 class BaseModel(models.Model):
     '''
