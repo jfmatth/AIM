@@ -4,6 +4,7 @@ from django.conf.urls.defaults import *
 from django.contrib.auth.decorators import login_required
 
 from aim.views import MainView, PortfolioUpdate, PortfolioCreate, HoldingCreate, TransactionCreate
+from aim.views import HoldingView
 
 urlpatterns = patterns('',
     url(r'^$',
@@ -15,23 +16,27 @@ urlpatterns = patterns('',
     url(r'^portfolio/(?P<pk>\d+)/$',
         login_required(PortfolioUpdate.as_view()),
         name = "portfolio_edit" ),
-#     url(r'^portfolio/edit/(?P<pk>\d+)/$',
-#         login_required(PortfolioUpdate.as_view()) ),
     url(r'^portfolio/add/$',
         login_required(PortfolioCreate.as_view()),
         name = "portfolio_add" ),
 
+    # Holding URL's
     url(r'^holding/add/(?P<portid>\d+)/$',
         login_required(HoldingCreate.as_view()),
         name = "holding_add"),
-                       
     url(r'^holding/add/$',
         login_required(HoldingCreate.as_view()),
         name = "holding_addplain"),
-                       
+    url(r'^holding/(?P<pk>\d+)/$',
+        login_required(HoldingView.as_view()),
+        name = "holding_view"),
+             
+    
+    # Transaction URL's
     url(r'^transaction/(?P<holding_id>\d+)/$',
         login_required(TransactionCreate.as_view() ),
         name = "transaction"),
+                       
                        
 #     (r'^portfolio/add/$',                          'aim.views.portfolio_add'),
 #     (r'^portfolio/edit/(?P<portfolio_id>\d+)/$',   'aim.views.portfolio_edit'),

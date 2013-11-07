@@ -89,7 +89,7 @@ class Holding(models.Model):
         # figure out how many shares's we have
         s = 0
         for t in self.transaction_set.all():
-            s = s + t.shares
+            s = s + t.total_shares()
         return s
     
     def value(self):
@@ -125,7 +125,6 @@ class HoldingAlert(models.Model):
 
         super(HoldingAlert,self).save(force_insert, force_update)
 
-#         if self.buyprice > 0:
         self.holding.currentalert = self
         self.holding.save()
 
@@ -234,14 +233,14 @@ class AimController(AimBase):
 
     def transaction(self, transaction=None):
         log.debug("AimController.transaction")
-        if transaction.total() > 0:
+        if transaction.total_sale() > 0:
             if not self.started:
                     # we can assume a control of 0 means its not started ?
                     # if so, then start control at the total sale price.
-                    self.control += transaction.total()
+                    self.control += transaction.total_sale()
             else:
                     # otherwise we only add 1/2 to the control
-                    self.control += transaction.total() / 2
+                    self.control += transaction.total_sale() / 2
                     
             self.started = True
             self.save()
@@ -265,18 +264,33 @@ class AimController(AimBase):
 #===============================================================================
 # Transaction - Each holding has transactions
 #===============================================================================
+transaction_types=(
+    ("Buy", "Buy Shares"),
+    ("Sell", "Sell Shares"),
+)
+
 class Transaction(models.Model):
     holding        = models.ForeignKey(Holding)
     
     date           = models.DateField()
     shares         = models.DecimalField(max_digits=10, decimal_places=3)
     price          = models.DecimalField(max_digits=8, decimal_places=3)
+    type           = models.CharField(max_length=10, choices=transaction_types, default="Buy") 
 
     def __unicode__(self):
-        return "%s %s (%s @ %s)" % (self.holding, self.date, self.shares, self.price)
+        return "%s [%s] (%s - .t%s @ %s)" % (self.holding, self.date, self.type, self.shares, self.price)
 
-    def total(self):
-        return self.shares * self.price
+    def __type_multiplier(self):
+        if self.type == transaction_types[0][0]:
+            return 1
+        elif self.type == transaction_types[1][0]:
+            return -1
+
+    def total_sale(self):
+        return self.shares * self.price * self.__type_multiplier()
+
+    def total_shares(self):
+        return self.shares * self.__type_multiplier()
 
     def save(self, force_insert=False, force_update=False):
         log.debug("Transaction.save()")

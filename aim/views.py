@@ -1,5 +1,5 @@
 #from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django import forms
 
 from django.views.generic.edit import CreateView, UpdateView
@@ -19,6 +19,13 @@ class MainView(ListView):
 
     def get_queryset(self):
         return Portfolio.objects.filter(owner=self.request.user)
+
+
+# Detail view for Holding
+class HoldingView(DetailView):
+    
+    template_name = "aim/HoldingView.html"
+    queryset = Holding.objects.all()
 
 #===============================================================================
 # Portofolio's
@@ -69,6 +76,7 @@ class PortfolioCreate(CreateView):
         
         return super(PortfolioCreate, self).get_initial()
 
+
 #===============================================================================
 # Holding's (forms and views)
 #===============================================================================
@@ -106,6 +114,7 @@ class HoldingCreate(CreateView):
         
         return super(HoldingCreate,self).get_initial()
 
+
 #===============================================================================
 # Transaction's (forms and views)
 #===============================================================================
@@ -117,7 +126,7 @@ class TransactionForm(forms.ModelForm):
         
     class Meta:
         model = Transaction
-        fields = ('date', 'shares', 'price', 'holding' )
+        fields = ('date', 'shares', 'price', 'holding', 'type' )
 
 class TransactionCreate(CreateView):
     model = Transaction
