@@ -5,7 +5,7 @@ from django import forms
 from django.views.generic.edit import CreateView, UpdateView
 from django.core.exceptions import ObjectDoesNotExist
 
-from aim.models import Portfolio, Holding, Symbol, Transaction
+from aim.models import Portfolio, Holding, Symbol, Transaction, AimBase
 
 #===============================================================================
 # MainView for /aim
@@ -21,12 +21,25 @@ class MainView(ListView):
         return Portfolio.objects.filter(owner=self.request.user)
 
 
+
+
+class ControlForm(forms.ModelForm):
+    class Meta:
+        model = AimBase
+        fields = ('started', 'control',)
+
 # Detail view for Holding
 class HoldingView(DetailView):
     
     template_name = "aim/HoldingView.html"
     queryset = Holding.objects.all()
-
+    
+    def get_context_data(self, **kwargs):
+        context = super(HoldingView, self).get_context_data(**kwargs)
+        context['controlform']  = ControlForm(instance=self.get_object().controller)
+         
+        return context
+        
 #===============================================================================
 # Portofolio's
 #===============================================================================
@@ -102,7 +115,7 @@ class HoldingForm(forms.ModelForm):
         model = Holding
         fields = ('symbol', 'portfolio' )
 
-class HoldingCreate(CreateView):
+class HoldingCreateView(CreateView):
     model = Holding
     form_class = HoldingForm
     success_url = "/aim/"
@@ -112,7 +125,7 @@ class HoldingCreate(CreateView):
         self.initial.update( {'user' : self.request.user} )
         self.initial.update( {'portid' : self.kwargs.get("portid", None) })
         
-        return super(HoldingCreate,self).get_initial()
+        return super(HoldingCreateView,self).get_initial()
 
 
 #===============================================================================

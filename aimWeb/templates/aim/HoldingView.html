@@ -8,84 +8,83 @@
 	</h1>
 </div>
 
-<div class="panel panel-primary">
-	<div class="panel-heading">
-	  General
+<form role="form">
+	<div class="panel panel-primary">
+		<div class="panel-heading">Panel - General Holding</div>
+		<div class="panel-body">
+				<div class="row">
+					<div class="col-md-4">
+							<label>Symbol</label>
+							<input class="form-control" id="symbol" placeholder="{{object.symbol}}">
+					</div>
+					<div class="col-md-4">
+							<label>Portfolio</label>
+							<input class="form-control" id="portfolio" placeholder="{{object.portfolio}}">
+					</div>
+				</div>
+		</div>
+		<div class="panel-footer">
+					  <button type="submit" class="btn btn-default pull-right">Submit</button>
+					  <div class="clearfix"></div>
+		</div>
 	</div>
-	
-	<div class="panel-body">
-		<div class="row">
-			<div class="col-md-4"><strong>Shares</strong></div>
-			<div class="col-md-4"><strong>Current Value</strong></div>
-			<div class="col-md-4"><strong>ROI </strong></div>
-		</div>			
-		<div class="row">
-			<div class="col-md-4"> {{object.shares}} </div>
-			<div class="col-md-4"> {{object.value}} </div>
-			<div class="col-md-4">ROI%</div>
-		</div>			
+</form>
+
+
+<form role="form">
+	<div class="panel panel-primary">
+		<div class="panel-heading">General Panel form</div>
+		<div class="panel-body">
+				<div class="row">
+					<div class="col-md-4">
+							<label>.col-md-4</label>
+							<input class="form-control" id="field1" placeholder="field1">
+					</div>
+					<div class="col-md-4">
+							<label>.col-md-4</label>
+							<input class="form-control" id="field2" placeholder="field2">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+							<label>.col-md-8</label>
+							<input class="form-control" id="field1" placeholder="field1">
+					</div>
+					<div class="col-md-6">
+							<label>.col-md-8</label>
+							<input class="form-control" id="field2" placeholder="field2">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+							<label>.col-md-4</label>
+							<input class="form-control" id="field1" placeholder="field1">
+					</div>
+					<div class="col-md-8">
+							<label>.col-md-8</label>
+							<input class="form-control" id="field2" placeholder="field2">
+					</div>
+				</div>
+
+		</div>
+		<div class="panel-footer">
+			  <button type="submit" class="btn btn-default pull-right">Submit</button>
+			  <div class="clearfix"></div>
+		</div>
 	</div>
+</form>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Panel title</h3>
+  </div>
+  <div class="panel-body">
+    Panel content
+  </div>
 </div>
 
-<div class="panel panel-primary">
-	<div class="panel-heading">
-	  Control Parameters
-	</div>
-	
-	<div class="panel-body">
-		<div class="row">
-			<div class="col-md-4"><strong>Type</strong></div>
-			<div class="col-md-4"><strong>Portfolio Control</strong></div>
-			<div class="col-md-4"><strong>Started</strong></div>
-		</div>
-					
-		<div class="row">
-			<div class="col-md-4">Aim Standard</div>
-			<div class="col-md-4">{{object.controller.control}}</div>
-			<div class="col-md-4">{{object.controller.started}}</div>
-		</div>
-		<p>
-		<div class="row">
-			<div class="col-md-2"><strong>Buy Safe</strong></div>
-			<div class="col-md-2"><strong>Buy $</strong></div>
-			<div class="col-md-2"><strong>Buy %</strong></div>
-			<div class="col-md-2"><strong>Sell Safe</strong></div>
-			<div class="col-md-2"><strong>Sell $</strong></div>
-			<div class="col-md-2"><strong>Sell %</strong></div>
-		</div>
-		<div class="row">
-			<div class="col-md-2">{{object.controller.buysafe}}</div>
-			<div class="col-md-2">{{object.controller.buymin}}</div>
-			<div class="col-md-2">{{object.controller.buyperc}}</div>
-			<div class="col-md-2">{{object.controller.sellsafe}}</div>
-			<div class="col-md-2">{{object.controller.sellmin}}</div>
-			<div class="col-md-2">{{object.controller.sellperc}}</div>
-		</div>			
-	</div>
-	
-</div>
 
-<div class="panel panel-primary">
-	<div class="panel-heading">
-	  Transactions
-	</div>
-	
-	<div class="panel-body"></div>
-	<table class="table">	
-		<tr>
-			<th>Date</th>
-			<th>Type</th>
-			<th>Shares</th>
-			<th>Price</th>
-		</tr>			
-		<tr>{% for t in object.transaction_set.all|dictsort:"date" %}
-			<td>{{t.date}}</td>
-			<td>{{t.type}}</td>
-			<td>{{t.shares}}</td>
-			<td>{{t.price}}</td>
-		</tr>{% endfor %}
-		</div>			
-	</table>
-</div>
 	
 {% endblock %}

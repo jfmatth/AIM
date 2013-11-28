@@ -67,6 +67,7 @@ class Portfolio(models.Model):
 class Holding(models.Model):
     portfolio    = models.ForeignKey(Portfolio)
     symbol       = models.ForeignKey(Symbol)
+    reason       = models.CharField(max_length=50, blank=True)
     currentalert = models.OneToOneField('HoldingAlert',
                                         related_name="alertholding",
                                         blank=True, null=True,

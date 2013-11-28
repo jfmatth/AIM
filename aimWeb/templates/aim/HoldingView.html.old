@@ -1,0 +1,110 @@
+{% extends "bootstrap.html" %}
+
+{% block body %}
+
+<div class="page-header">
+	<h1> {{object.symbol}} 
+	<small> {{object.symbol.description}} </small>
+	</h1>
+</div>
+
+<div class="panel panel-primary">
+	<div class="panel-heading">
+	  General
+	</div>
+
+	<form role="form-inline">
+  		<div class="form-group">
+			<div class="row">
+				<div class="col-md-4"><strong>Shares</strong></div>
+				<div class="col-md-4"><strong>Current Value</strong></div>
+				<div class="col-md-4"><strong>ROI </strong></div>
+			</div>			
+    		<label>Shares</label>
+    		<input type="shares" class="form-control" id="shares" placeholder="{{object.shares}}">
+  		</div>
+		<div class="form-group">
+			<label for="exampleInputPassword1">Password</label>
+		    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+		</div>
+	</form>
+	
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-4"><strong>Shares</strong></div>
+			<div class="col-md-4"><strong>Current Value</strong></div>
+			<div class="col-md-4"><strong>ROI </strong></div>
+		</div>			
+		<div class="row">
+			<div class="col-md-4"> {{object.shares}} </div>
+			<div class="col-md-4"> {{object.value}} </div>
+			<div class="col-md-4">ROI%</div>
+		</div>			
+	</div>
+</div>
+
+<div class="panel panel-primary">
+	<div class="panel-heading">
+	  Control Parameters
+	</div>
+
+	<form>
+	{{ controlform }}
+	</form>
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-4"><strong>Type</strong></div>
+			<div class="col-md-4"><strong>Portfolio Control</strong></div>
+			<div class="col-md-4"><strong>Started</strong></div>
+		</div>
+					
+		<div class="row">
+			<div class="col-md-4">Aim Standard</div>
+			<div class="col-md-4">{{object.controller.control}}</div>
+			<div class="col-md-4">{{object.controller.started}}</div>
+		</div>
+		<p>
+		<div class="row">
+			<div class="col-md-2"><strong>Buy Safe</strong></div>
+			<div class="col-md-2"><strong>Buy $</strong></div>
+			<div class="col-md-2"><strong>Buy %</strong></div>
+			<div class="col-md-2"><strong>Sell Safe</strong></div>
+			<div class="col-md-2"><strong>Sell $</strong></div>
+			<div class="col-md-2"><strong>Sell %</strong></div>
+		</div>
+		<div class="row">
+			<div class="col-md-2">{{object.controller.buysafe}}</div>
+			<div class="col-md-2">{{object.controller.buymin}}</div>
+			<div class="col-md-2">{{object.controller.buyperc}}</div>
+			<div class="col-md-2">{{object.controller.sellsafe}}</div>
+			<div class="col-md-2">{{object.controller.sellmin}}</div>
+			<div class="col-md-2">{{object.controller.sellperc}}</div>
+		</div>			
+	</div>
+	
+</div>
+
+<div class="panel panel-primary">
+	<div class="panel-heading">
+	  Transactions
+	</div>
+	
+	<div class="panel-body"></div>
+	<table class="table">	
+		<tr>
+			<th>Date</th>
+			<th>Type</th>
+			<th>Shares</th>
+			<th>Price</th>
+		</tr>			
+		<tr>{% for t in object.transaction_set.all|dictsort:"date" %}
+			<td>{{t.date}}</td>
+			<td>{{t.type}}</td>
+			<td>{{t.shares}}</td>
+			<td>{{t.price}}</td>
+		</tr>{% endfor %}
+		</div>			
+	</table>
+</div>
+	
+{% endblock %}
