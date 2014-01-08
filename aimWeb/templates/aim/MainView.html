@@ -30,7 +30,7 @@
     
 		    {% for h in p.holding_set.all %}
 		    <tr>
-		        <td><a href="{% url "transaction" h.id %}" >{{ h.symbol }}</a></td>
+		        <td><a href="{% url "holding_view" h.id %}" >{{ h.symbol }}</a></td>
 		        <td>{{ h.shares }}</td>
 		        <td>{{ h.value }}</td>
 		        <td>{{ h.symbol.currentprice.close }}</td>

@@ -1,90 +1,183 @@
 {% extends "bootstrap.html" %}
 
 {% block body %}
-
-<div class="page-header">
-	<h1> {{object.symbol}} 
-	<small> {{object.symbol.description}} </small>
-	</h1>
-</div>
-
-<form role="form">
-	<div class="panel panel-primary">
-		<div class="panel-heading">Panel - General Holding</div>
-		<div class="panel-body">
-				<div class="row">
-					<div class="col-md-4">
-							<label>Symbol</label>
-							<input class="form-control" id="symbol" placeholder="{{object.symbol}}">
-					</div>
-					<div class="col-md-4">
-							<label>Portfolio</label>
-							<input class="form-control" id="portfolio" placeholder="{{object.portfolio}}">
-					</div>
-				</div>
-		</div>
-		<div class="panel-footer">
-					  <button type="submit" class="btn btn-default pull-right">Submit</button>
-					  <div class="clearfix"></div>
-		</div>
+	<div class="page-header">
+		{% if newrecord %} 
+			<h1> New Holding </h1>
+		{% else %}
+			<h1> {{object.symbol}} 
+			<small> {{object.symbol.description}} </small>
+			</h1>
+		{% endif %}
+		
 	</div>
-</form>
+
+	<form role="form" action="." method="post">{% csrf_token %}
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				General
+			</div>
+			
+			<div class="panel-body">
+				{{ form.non_field_errors }}
+
+				{{ form.as_p }}
+	
+			<div class="panel-footer">
+				  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+				  <div class="clearfix"></div>
+			</div>
+			
+		</div>
+	
+{% if False %}
+		{% if true %}
+				{{form.as_p}}
+		{% else %}
+		
+		<div class="panel panel-primary">
+		{{ form.non_field_errors }}
+			<div class="panel-heading">
+				General Editing
+			</div>
+
+			<div class="panel-body">
+				<div class="row col-md-4">
+					<p>Symbolx</p>
+					<h4> {{object.symbol}} </h4>
+				</div>
+				<div class="row col-md-4">
+				    <label>Reason</label>
+    				<input class="form-control" id="exampleInputEmail1" placeholder={{object.reason}}>
+    			</div>
+  			</div>
+
+			<div class="panel-footer">
+				  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+				  <div class="clearfix"></div>
+			</div>
+		</div>
+		{% endif %}
+	
+{% endif %}
+
+	</form>
 
 
-<form role="form">
-	<div class="panel panel-primary">
-		<div class="panel-heading">General Panel form</div>
-		<div class="panel-body">
+{% if false %}	
+	{{ form.non_field_errors }}
+
+	<form role="form" action="." method="post">{% csrf_token %}
+	{{form.as_p}}
+			<div class="panel-footer">
+				  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+				  <div class="clearfix"></div>
+			</div>
+	</form>
+
+	<form role="form" action="." method="post">{% csrf_token %}
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				General
+			</div>
+			
+			<div class="panel-body">
 				<div class="row">
 					<div class="col-md-4">
-							<label>.col-md-4</label>
-							<input class="form-control" id="field1" placeholder="field1">
+						<label for="{{form.symbol.label}}">{{form.symbol.label}}</label>
+						<input class="form-control" id="{{form.symbol.id_for_label}}" name="{{form.symbol.name}}">
 					</div>
+
+					
 					<div class="col-md-4">
-							<label>.col-md-4</label>
-							<input class="form-control" id="field2" placeholder="field2">
+						<label>{{form.portfolio.label}}</label>
+						<select class="form-control" id="{{form.portfolio.id_for_label}}" name="{{form.portfolio.name}}">
+
+						{% for choice in form.portfolio.field.choices %}
+
+							{% if choice.0 == form.portfolio.field.initial %}
+								<option selected="selected">{{choice.1}}</option>
+							{% else %}
+								<option value="{{choice.0}}">{{choice.1}}</option>
+							{% endif %}
+							
+						{% endfor %}
+						</select>
 					</div>
 				</div>
+				
 				<div class="row">
-					<div class="col-md-6">
-							<label>.col-md-8</label>
-							<input class="form-control" id="field1" placeholder="field1">
-					</div>
-					<div class="col-md-6">
-							<label>.col-md-8</label>
-							<input class="form-control" id="field2" placeholder="field2">
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-4">
-							<label>.col-md-4</label>
-							<input class="form-control" id="field1" placeholder="field1">
-					</div>
 					<div class="col-md-8">
-							<label>.col-md-8</label>
-							<input class="form-control" id="field2" placeholder="field2">
+						<label>{{form.reason.label}}</label>
+						<input class="form-control" id="{{form.reason.id_for_label}}">
 					</div>
 				</div>
+				
+			</div>
+			
+			<div class="panel-footer">
+				  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+				  <div class="clearfix"></div>
+			</div>
+		</div>
+	</form>
 
+{% endif %}
+
+{% if form.id %} 
+	
+	<form role="form">
+		<div class="panel panel-info">
+			<div class="panel-heading">General Panel form</div>
+			<div class="panel-body">
+					<div class="row col-md-4">
+								<label>.col-md-4</label>
+								<input class="form-control" id="field1" placeholder="field1">
+						<div class="col-md-4">
+								<label>.col-md-4</label>
+								<input class="form-control" id="field2" placeholder="field2">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+								<label>.col-md-8</label>
+								<input class="form-control" id="field1" placeholder="field1">
+						</div>
+						<div class="col-md-6">
+								<label>.col-md-8</label>
+								<input class="form-control" id="field2" placeholder="field2">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4">
+								<label>.col-md-4</label>
+								<input class="form-control" id="field1" placeholder="field1">
+						</div>
+						<div class="col-md-8">
+								<label>.col-md-8</label>
+								<input class="form-control" id="field2" placeholder="field2">
+						</div>
+					</div>
+	
+			</div>
+			<div class="panel-footer">
+				  <button type="submit" class="btn btn-default pull-right">Submit</button>
+				  <div class="clearfix"></div>
+			</div>
 		</div>
-		<div class="panel-footer">
-			  <button type="submit" class="btn btn-default pull-right">Submit</button>
-			  <div class="clearfix"></div>
-		</div>
+	</form>
+	
+	
+	
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Panel title</h3>
+	  </div>
+	  <div class="panel-body">
+	    Panel content
+	  </div>
 	</div>
-</form>
 
-
-
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Panel title</h3>
-  </div>
-  <div class="panel-body">
-    Panel content
-  </div>
-</div>
-
-
+{% endif %}
 	
 {% endblock %}
