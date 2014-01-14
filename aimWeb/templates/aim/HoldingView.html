@@ -2,66 +2,82 @@
 
 {% block body %}
 	<div class="page-header">
-		{% if newrecord %} 
+		{% if not object.id %} 
 			<h1> New Holding </h1>
 		{% else %}
 			<h1> {{object.symbol}} 
 			<small> {{object.symbol.description}} </small>
+			in <small>{{object.portfolio}} </small>
 			</h1>
 		{% endif %}
 		
 	</div>
 
-	<form role="form" action="." method="post">{% csrf_token %}
+	<form role="form" action="." method="post" name="_holding">{% csrf_token %}
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 				General
 			</div>
 			
 			<div class="panel-body">
-				{{ form.non_field_errors }}
+		    {% for field in form %}
+		        <div class="form-group">
+		            {{ field.errors }}
+		            {{ field.label_tag }} {{ field }}
+		        </div>
+		    {% endfor %}
 
-				{{ form.as_p }}
-	
+			</div>
 			<div class="panel-footer">
 				  <button type="submit" class="btn btn-primary pull-right">Submit</button>
 				  <div class="clearfix"></div>
 			</div>
 			
 		</div>
+	</form>
 	
-{% if False %}
-		{% if true %}
-				{{form.as_p}}
-		{% else %}
-		
-		<div class="panel panel-primary">
-		{{ form.non_field_errors }}
-			<div class="panel-heading">
-				General Editing
-			</div>
-
+	<form role="form" action="." method="post" name="_control">{% csrf_token %}
+		<div class="panel panel-info">
+			<div class="panel-heading">AIM Control parameters</div>
 			<div class="panel-body">
-				<div class="row col-md-4">
-					<p>Symbolx</p>
-					<h4> {{object.symbol}} </h4>
-				</div>
-				<div class="row col-md-4">
-				    <label>Reason</label>
-    				<input class="form-control" id="exampleInputEmail1" placeholder={{object.reason}}>
-    			</div>
-  			</div>
-
+					<div class="row col-md-4">
+								<label>.col-md-4</label>
+								<input class="form-control" id="field1" placeholder="field1">
+						<div class="col-md-4">
+								<label>.col-md-4</label>
+								<input class="form-control" id="field2" placeholder="field2">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+								<label>.col-md-8</label>
+								<input class="form-control" id="field1" placeholder="field1">
+						</div>
+						<div class="col-md-6">
+								<label>.col-md-8</label>
+								<input class="form-control" id="field2" placeholder="field2">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4">
+								<label>.col-md-4</label>
+								<input class="form-control" id="field1" placeholder="field1">
+						</div>
+						<div class="col-md-8">
+								<label>.col-md-8</label>
+								<input class="form-control" id="field2" placeholder="field2">
+						</div>
+					</div>
+	
+			</div>
 			<div class="panel-footer">
-				  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+				  <button type="submit" class="btn btn-default pull-right">Submit</button>
 				  <div class="clearfix"></div>
 			</div>
 		</div>
-		{% endif %}
-	
-{% endif %}
-
 	</form>
+	
+
 
 
 {% if false %}	

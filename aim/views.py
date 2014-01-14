@@ -54,18 +54,17 @@ class HoldingCreateView(CreateView):
 
     template_name = "aim/HoldingView.html"
 
-    def get_context_data(self, **kwargs):
-        cd = super(HoldingCreateView,self).get_context_data(**kwargs)
-        cd['newrecord'] = True
-        
-        return cd
-    
     def get_form_kwargs(self):
         kwargs = super(HoldingCreateView,self).get_form_kwargs()
         kwargs['user'] = self.request.user
         kwargs['portid'] = self.kwargs.get("portid", None)
         
         return kwargs 
+    
+    def get_initial(self):
+        initial = super(HoldingCreateView, self).get_initial()
+        
+    
 
 class HoldingUpdateView(UpdateView):
     template_name = "aim/HoldingView.html"
@@ -84,7 +83,7 @@ class HoldingUpdateView(UpdateView):
     def get_initial(self):
         # setup the symbol, otherwise it will show the FK id instead.
         initial = super(HoldingUpdateView, self).get_initial()
-        initial.update({'symbol':self.object.symbol} )
+        initial.update( {'symbol':self.object.symbol} )
         
         return initial
         
