@@ -36,7 +36,7 @@ urlpatterns = patterns('',
     url(r'^transaction/(?P<holding_id>\d+)/$',
         login_required(TransactionCreate.as_view() ),
         name = "transaction"),
-                       
+
                        
 #     (r'^portfolio/add/$',                          'aim.views.portfolio_add'),
 #     (r'^portfolio/edit/(?P<portfolio_id>\d+)/$',   'aim.views.portfolio_edit'),

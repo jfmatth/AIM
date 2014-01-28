@@ -13,7 +13,7 @@
 		
 	</div>
 
-	<form role="form" action="." method="post" name="_holding">{% csrf_token %}
+	<form role="form" action="." method="post" >{% csrf_token %}
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 				General
@@ -29,49 +29,27 @@
 
 			</div>
 			<div class="panel-footer">
-				  <button type="submit" class="btn btn-primary pull-right">Submit</button>
+				  <input type="submit" name="_holding" class="btn btn-primary pull-right">Submit</button>
 				  <div class="clearfix"></div>
 			</div>
 			
 		</div>
 	</form>
 	
-	<form role="form" action="." method="post" name="_control">{% csrf_token %}
+	<form role="form" action="." method="post" >{% csrf_token %}
 		<div class="panel panel-info">
 			<div class="panel-heading">AIM Control parameters</div>
 			<div class="panel-body">
-					<div class="row col-md-4">
-								<label>.col-md-4</label>
-								<input class="form-control" id="field1" placeholder="field1">
-						<div class="col-md-4">
-								<label>.col-md-4</label>
-								<input class="form-control" id="field2" placeholder="field2">
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-6">
-								<label>.col-md-8</label>
-								<input class="form-control" id="field1" placeholder="field1">
-						</div>
-						<div class="col-md-6">
-								<label>.col-md-8</label>
-								<input class="form-control" id="field2" placeholder="field2">
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-4">
-								<label>.col-md-4</label>
-								<input class="form-control" id="field1" placeholder="field1">
-						</div>
-						<div class="col-md-8">
-								<label>.col-md-8</label>
-								<input class="form-control" id="field2" placeholder="field2">
-						</div>
-					</div>
-	
+			    {% for field in controlform %}
+			        <div class="form-group">
+			            {{ field.errors }}
+			            {{ field.label_tag }} {{ field }}
+			        </div>
+			    {% endfor %}
+
 			</div>
 			<div class="panel-footer">
-				  <button type="submit" class="btn btn-default pull-right">Submit</button>
+				  <input type="submit" name="_control" class="btn btn-default pull-right">Submit</button>
 				  <div class="clearfix"></div>
 			</div>
 		</div>

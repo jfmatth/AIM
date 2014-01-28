@@ -4,7 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView
 
 from aim.forms import PortfolioForm, ControlForm, HoldingForm, TransactionForm
 
-from aim.models import Portfolio, Holding, Symbol, Transaction, AimBase
+from aim.models import Portfolio, Holding, Symbol, Transaction, AimController
 
 #===============================================================================
 # MainView for /aim
@@ -20,6 +20,8 @@ class MainView(ListView):
         return Portfolio.objects.filter(owner=self.request.user)
 
 
+
+
 #===============================================================================
 # Portofolio's
 #===============================================================================
@@ -28,20 +30,20 @@ class PortfolioUpdate(UpdateView):
     success_url = "/aim/"
     form_class = PortfolioForm
 
+
 class PortfolioCreate(CreateView):
     model = Portfolio
     form_class = PortfolioForm
     
     success_url = "/aim/"
 
-    def form_valid(self, form):
+    def get_form(self, form_class):
+        # Since we don't show the owner field, take it from the user
+        # requesting to add this portfolio.
+        form = super(PortfolioCreate,self).get_form(form_class)
         form.instance.owner = self.request.user
-        return super(PortfolioCreate, self).form_valid(form)
+        return form
 
-    def get_initial(self):
-        # save the user object for use in the Form
-        self.initial.update( {'user' : self.request.user} )
-        return super(PortfolioCreate, self).get_initial()
 
 
 #===============================================================================
@@ -54,39 +56,68 @@ class HoldingCreateView(CreateView):
 
     template_name = "aim/HoldingView.html"
 
-    def get_form_kwargs(self):
-        kwargs = super(HoldingCreateView,self).get_form_kwargs()
-        kwargs['user'] = self.request.user
-        kwargs['portid'] = self.kwargs.get("portid", None)
+    def get_form(self, form_class):
+        form = super(HoldingCreateView, self).get_form(form_class)
+       
+        # setup the available portfolios and the inital value if any for this holding
+        form.fields['portfolio'].queryset = Portfolio.objects.filter(owner=self.request.user)
+        form.fields['portfolio'].initial = self.kwargs.get("portid", None)
         
-        return kwargs 
+        return form
     
-    def get_initial(self):
-        initial = super(HoldingCreateView, self).get_initial()
-        
     
-
 class HoldingUpdateView(UpdateView):
     template_name = "aim/HoldingView.html"
-    form_class = HoldingForm
+    #form_class = HoldingForm
     model = Holding
     success_url = "/aim/"
-    queryset = Holding.objects.all()
-
-    def get_form_kwargs(self):
-        kwargs = super(HoldingUpdateView,self).get_form_kwargs()
-        kwargs['user'] = self.request.user
-        kwargs['portid'] = self.kwargs.get("portid", None)
-        
-        return kwargs 
-
+    
     def get_initial(self):
         # setup the symbol, otherwise it will show the FK id instead.
         initial = super(HoldingUpdateView, self).get_initial()
         initial.update( {'symbol':self.object.symbol} )
         
         return initial
+
+    def get_queryset(self):
+        # return only the records that we are allowed to see
+        return Holding.objects.filter(portfolio__owner = self.request.user)
+
+    def get_form_kwargs(self):
+        kwargs = super(HoldingUpdateView,self).get_form_kwargs()
+
+        # if we are POSTing a control button, then return the control object, 
+        # otherwise treat it as a holding object.        
+        if "_control" in self.request.POST:
+            kwargs.update({'instance': self.object.controller})
+        else:
+            kwargs.update({'instance': self.object})
+
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        cd = super(HoldingUpdateView, self).get_context_data(**kwargs)
         
+        cd['controlform'] = ControlForm(instance = self.object.controller)
+        
+        return cd
+    
+    def get_form_class(self):
+        # this line is the same as specifying the form_class as a  
+        # class variable.
+        if self.request.method == "GET":
+            return HoldingForm
+        
+        # if we are posting, figure out if we hit the submit button on the holding form
+        # or the control form.
+        if "_holding" in self.request.POST:
+            return HoldingForm
+        else:
+            if "_control" in self.request.POST:
+                return ControlForm
+            else:
+                return super(HoldingUpdateView,self).get_form_class()
+
 
 #===============================================================================
 # Transaction
