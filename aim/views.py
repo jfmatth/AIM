@@ -127,6 +127,10 @@ class TransactionCreate(CreateView):
     form_class = TransactionForm
     success_url = "/aim/"
 
+    def get_queryset(self):
+        return Transaction.objects.filter(holding__portfolio__owner = self.request.user)
+
+
     def get_initial(self):
         # save the user object for use in the Form
         self.initial.update( {'holding_id' : self.kwargs.get("holding_id", None) })

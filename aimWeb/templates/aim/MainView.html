@@ -19,10 +19,10 @@
 		            <th>Holding</th>
 		            <th>Shares</th>
 		            <th>Value</th>
-		            <th>Current Price</th>
 		            <th>Action(B/S) </th>
 		            <th></th>
 		            <th>Next Buy</th>
+		            <th>Current Price</th>
 		            <th>Next Sell</th>
 		            <th>Transaction</th>
 		        </tr>
@@ -33,10 +33,10 @@
 		        <td><a href="{% url "holding_view" h.id %}" >{{ h.symbol }}</a></td>
 		        <td>{{ h.shares }}</td>
 		        <td>{{ h.value }}</td>
-		        <td>{{ h.symbol.currentprice.close }}</td>
-		        <td> </td>
+		        <td>Action</td>
 		        <td></td>
 		        <td> {{ h.currentalert.buyprice }} </td>
+		        <td> {{ h.symbol.currentprice.close }}</td>
 		        <td> {{ h.currentalert.sellprice }}</td>
 		        <td> <a href="{% url "transaction" h.id %}" type="button" class="btn btn-success" >Buy </a> 
 		        	 <a href="{% url "transaction" h.id %}" type="button" class="btn btn-danger" >Sell </a>
@@ -55,26 +55,5 @@
         
     {% endfor %}
    
-	
-	{% if public_list %}
-	    <h1> Public Portfoliios </h1>
-	    {% for p in public_list %}
-	        {{p}} <br>
-	    {% endfor %}
-	
-	{% endif %}
-
-
-<div class="panel panel-default">
-  <div class="panel-heading">Panel heading without title</div>
-  
-  <div class="panel-body">
-    Panel content
-  </div>
-</div>
-
-
-	
-	
 
 {% endblock %}
