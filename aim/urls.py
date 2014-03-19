@@ -2,9 +2,10 @@
  
 from django.conf.urls.defaults import *
 from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
 
 from aim.views import MainView, PortfolioUpdate, PortfolioCreate, HoldingCreateView, TransactionCreate
-from aim.views import HoldingUpdateView
+from aim.views import HoldingUpdateView, PriceView 
 
 urlpatterns = patterns('',
     url(r'^$',
@@ -36,6 +37,10 @@ urlpatterns = patterns('',
     url(r'^transaction/(?P<holding_id>\d+)/$',
         login_required(TransactionCreate.as_view() ),
         name = "transaction"),
+                       
+    url(r'price/(?P<holding_id>\d+)/$', PriceView.as_view() ),
+    
+    url(r'^graphdata/', TemplateView.as_view(template_name="aim/graphdata.html")),
 
                        
 #     (r'^portfolio/add/$',                          'aim.views.portfolio_add'),

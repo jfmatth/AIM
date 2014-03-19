@@ -1,6 +1,8 @@
-#from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import TemplateView
 
 from aim.forms import PortfolioForm, ControlForm, HoldingForm, TransactionForm
 
@@ -136,3 +138,11 @@ class TransactionCreate(CreateView):
         self.initial.update( {'holding_id' : self.kwargs.get("holding_id", None) })
         
         return super(TransactionCreate,self).get_initial()
+
+
+
+class PriceView(TemplateView):
+    template_name = "aim/chartview.html"
+    
+    
+    
