@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from decimal import Decimal
+
+import datetime
 # from django.core.exceptions import ObjectDoesNotExist
 
 # import datetime
-from decimal import Decimal
-import logging
 
-log = logging.getLogger(__name__)
 
 # import util.aim_utilities
 
@@ -42,6 +42,10 @@ class Price(models.Model):
     
     def __unicode__(self):
         return "%s %s %s" % (self.symbol.name, self.date, self.close)
+    
+    def jsdate(self):
+        return int( (datetime.datetime.fromordinal(self.date.toordinal() )-datetime.datetime(1970,1,1)).total_seconds() * 1000 )
+ 
 
 #===============================================================================
 # Portfolio 
@@ -75,7 +79,6 @@ class Holding(models.Model):
                                         )
     
     def save(self, force_insert=False, force_update=False):
-        log.debug("Holding.Save()")
         if self.id == None:
             # New record, so lets save a new Controller record too.
             super(Holding, self).save(force_insert, force_update)
@@ -119,7 +122,6 @@ class HoldingAlert(models.Model):
         return "%s b:%s s:%s" % (self.holding, self.buyprice,self.sellprice)
 
     def save(self, force_insert=False, force_update=False):
-        log.debug("Save() in Holdingalert")
         if self.id == None:
             self.buyprice = self.holding.controller.BuyPrice()
             self.sellprice = self.holding.controller.SellPrice()
@@ -136,7 +138,7 @@ class HoldingAlert(models.Model):
 class AimBase(models.Model):
     holding   = models.OneToOneField(Holding, related_name="controller")
 
-    started   = models.BooleanField()                   # is the program started?
+    started   = models.BooleanField(default=False)                   # is the program started?
     control   = models.IntegerField(default=0)           # Portfolio Control
     sellsafe  = models.IntegerField(default=10)          # SAFE for sales, a percentage value
     buysafe   = models.IntegerField(default=10)          # SAFE for buys
@@ -233,7 +235,6 @@ class AimController(AimBase):
 
 
     def transaction(self, transaction=None):
-        log.debug("AimController.transaction")
         if transaction.total_sale() > 0:
             if not self.started:
                     # we can assume a control of 0 means its not started ?
@@ -251,7 +252,6 @@ class AimController(AimBase):
            
             
     def save(self, force_insert=False, force_update=False):
-        log.debug("AimController.save()")
         super(AimController, self).save(force_insert, force_update)
         
 #         # Add a holding alert for this change to our AIM settings
@@ -293,8 +293,10 @@ class Transaction(models.Model):
     def total_shares(self):
         return self.shares * self.__type_multiplier()
 
+    def jsdate(self):
+        return int( (datetime.datetime.fromordinal(self.date.toordinal() )-datetime.datetime(1970,1,1)).total_seconds() * 1000 )
+
     def save(self, force_insert=False, force_update=False):
-        log.debug("Transaction.save()")
         super(Transaction, self).save(force_insert, force_update)
         
         self.holding.controller.transaction(transaction=self)

@@ -142,7 +142,7 @@ class TransactionCreate(CreateView):
 
 
 class PriceView(TemplateView):
-    template_name = "aim/chartview.html"
+    template_name = "chartview.html"
     
     
     

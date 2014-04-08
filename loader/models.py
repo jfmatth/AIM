@@ -27,3 +27,9 @@ class ExchangePrice(BaseModel):
     exchange = models.ForeignKey(Exchange)
     data = models.TextField(blank=True, null=True)
     loaded = models.BooleanField()
+    
+class PriceError(BaseModel):
+    symbolname = models.CharField(max_length=10, db_index=True, unique=True)
+    
+    def __unicode__(self):
+        return self.symbolname

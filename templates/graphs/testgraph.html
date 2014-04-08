@@ -1,0 +1,42 @@
+{% load staticfiles %}
+
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Highstock Example</title>
+		<script src="{% static "js/jquery-2.0.3.js" %}"> </script>
+		<script type="text/javascript">
+			$(function() {
+				$.getJSON('/graph/{{symbol}}/', function(data) {
+					// Create the chart
+					$('#container').highcharts('StockChart', {
+					
+						rangeSelector : {
+							selected : 1
+						},
+			
+						title : {
+							text : '{{symbol}} Stock Price'
+						},
+						
+						series : [{
+							name : '{{symbol}}',
+							data : data,
+							
+						}]
+					});
+				});
+			
+			});
+		</script>
+		<script src="{% static "js/highstock.js" %}"> </script>
+		<script src="{% static "js/exporting.js" %}"> </script>
+	</head>
+        
+	<body>
+		<h1> {{symbol}} </h1>
+		<div id="container" style="height: 500px; min-width: 500px">
+		</div>
+	</body>
+</html>
