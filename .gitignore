@@ -2,10 +2,11 @@ data/
 local_settings.py
 *.sq3
 *.db
+db.sqlite3
 *.pyc
 .project
 .pydevproject
 manage.py
 .settings
-activate.bat
+activate.cmd
 *.log
