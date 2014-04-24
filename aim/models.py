@@ -102,6 +102,18 @@ class Holding(models.Model):
         else:
             return 0
         
+    def alert(self):
+        # if there is a buy or sell alert on this holding, this will be true
+        if self.value() > 0:
+            if self.symbol.currentprice.close < self.currentalert.buyprice:
+                return True
+        
+            if self.symbol.currentprice.close > self.currentalert.sellprice:
+                return True
+    
+        return False
+
+
     class Meta:
         unique_together = ("portfolio", "symbol")
 
@@ -253,11 +265,14 @@ class AimController(AimBase):
             
     def save(self, force_insert=False, force_update=False):
         super(AimController, self).save(force_insert, force_update)
-        
+
 #         # Add a holding alert for this change to our AIM settings
 #         ha = HoldingAlert()
 #         ha.holding = self.holding
 #         ha.save()
+        if not self.id==None:
+            HoldingAlert(holding=self.holding).save()
+        
 
     def __unicode__(self):
         return "%s (%s)" % (self.holding, self.control)

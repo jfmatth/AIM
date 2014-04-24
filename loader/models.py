@@ -18,6 +18,7 @@ class BaseModel(models.Model):
 class Exchange(BaseModel):
     name = models.CharField(max_length=100)
     data = models.TextField(blank=True, null=True)
+    
     loaded = models.BooleanField()
     
     def __unicode__(self):
@@ -26,6 +27,7 @@ class Exchange(BaseModel):
 class ExchangePrice(BaseModel):
     exchange = models.ForeignKey(Exchange)
     data = models.TextField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
     loaded = models.BooleanField()
     
 class PriceError(BaseModel):

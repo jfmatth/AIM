@@ -7,7 +7,7 @@ class graphview(ListView):
     template_name = "graphs/graphview.html"
 
     def get_queryset(self):
-        return Symbol.objects.get(name=self.kwargs['symbol']).price_set.all()
+        return Symbol.objects.get(name=self.kwargs['symbol']).price_set.order_by('date')
 
 class testgraphview(ListView):
     template_name = "graphs/testgraph.html"

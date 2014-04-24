@@ -8,52 +8,46 @@
 	
     {% for p in object_list %}
 	<div class="panel panel-default">
-  		<div class="panel-heading"><a href="{% url "portfolio_edit" p.id %}"> {{p}} </a></div>
+  		<div class="panel-heading">
+  			<h3 class="panel-title"><a href="{% url "portfolio_edit" p.id %}"> {{p}} </a></h3>
+  		</div>
 		<div class="panel-body">
-		
-		</div>
-
-        <table class="table">
 			{% if p.holding_set.all %}
+	        <table class="table">
 		        <tr>
 		            <th>Holding</th>
 		            <th>Shares</th>
 		            <th>Value</th>
-		            <th>Action(B/S) </th>
-		            <th></th>
+		            <th>Alert</th>
 		            <th>Next Buy</th>
 		            <th>Current Price</th>
 		            <th>Next Sell</th>
 		            <th>Transaction</th>
 		        </tr>
+	    
+			    {% for h in p.holding_set.all %}
+			    <tr>
+			        <td><a href="{% url "holding_view" h.id %}" >{{ h.symbol }}</a></td>
+			        <td>{{ h.shares }}</td>
+			        <td>{{ h.value }}</td>
+			        <td>{{ h.alert }}</td>
+			        <td> {{ h.currentalert.buyprice }} </td>
+			        <td> {{ h.symbol.currentprice.close }}</td>
+			        <td> {{ h.currentalert.sellprice }}</td>
+			        <td> <a href="{% url "transaction" h.id %}" type="button" class="btn btn-success" >Buy </a> 
+			        	 <a href="{% url "transaction" h.id %}" type="button" class="btn btn-danger" >Sell </a>
+			        </td>
+			    </tr>
+				{% endfor %}
+	    	</table>
 		    {% endif %}
-    
-		    {% for h in p.holding_set.all %}
-		    <tr>
-		        <td><a href="{% url "holding_view" h.id %}" >{{ h.symbol }}</a></td>
-		        <td>{{ h.shares }}</td>
-		        <td>{{ h.value }}</td>
-		        <td>Action</td>
-		        <td></td>
-		        <td> {{ h.currentalert.buyprice }} </td>
-		        <td> {{ h.symbol.currentprice.close }}</td>
-		        <td> {{ h.currentalert.sellprice }}</td>
-		        <td> <a href="{% url "transaction" h.id %}" type="button" class="btn btn-success" >Buy </a> 
-		        	 <a href="{% url "transaction" h.id %}" type="button" class="btn btn-danger" >Sell </a>
-		        </td>
-		    </tr>
-	{% endfor %}
-    </table>
+		</div> <!-- panel-body -->
+		<div class="panel-footer"><a href="{% url "holding_add" p.id %} ">Add Holding </a></div>
 
-    </div>
+    </div>	<!-- panel -->
     
-    <a href="{% url "holding_add" p.id %} ">Add Holding </a>
-        
-        
-  </div>	
-</div>
+    
         
     {% endfor %}
    
-
 {% endblock %}

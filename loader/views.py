@@ -66,8 +66,7 @@ def ImportPrices(f):
             print "Problem with %s" % csvline
             # add this to the price error if necessary
             p, c = PriceError.objects.get_or_create(symbolname = csvline[0] )
-#         finally:
-#             None
+
 
 def LoadPrices(request):
 

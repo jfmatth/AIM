@@ -19,18 +19,32 @@
 						text : '{{object.symbol}} Price history'
 					},
 					
+					{% if object.transaction_set.all %}
+					yAxis : {
+						plotBands : [{
+							from : {{object.currentalert.buyprice}},
+							to :   {{object.currentalert.sellprice}},
+							color : 'rgba(68, 170, 213, 0.2)',
+							label : {
+								text : '{{object.currentalert.buyprice}} - {{object.currentalert.sellprice}}'
+							}
+						}]
+					},
+					{% endif %}
+				
+					
 					series : [{
 							name : '{{object.symbol}}',
 							data : data,
 							id: 'dataseries'
 					}
-					{% if object.transaction_set %}
+					{% if object.transaction_set.all %}
 					,{
 						type : 'flags',
 						data : [{
 					{% for t in object.transaction_set.all|dictsort:"date" %}
 								x : {{t.jsdate}},
-								title : '{{t.type}}',
+								title : '{{t.type}}@{{t.price}}',
 								text : '{{t.type}} {{t.shares}} @ {{t.price}}'
 							}{% if not forloop.last %},{ {% endif %}{% endfor %}],
 						onSeries : 'dataseries',
@@ -60,7 +74,29 @@
 			</h1>
 		{% endif %}
 		
+		<a href="{% url "main" %} ">Main Portfolio List</a>
 	</div>
+
+	{% if object.alert %}
+		{% if object.symbol.currentprice.close < object.currentalert.buyprice %}
+		<div class="panel panel-success">
+		<div class="panel-heading">BUY ALERT</div>
+		{% else %}
+		<div class="panel panel-danger">
+		<div class="panel-heading">SELL ALERT</div>
+		{% endif %}
+		<div class="panel-body">
+		Alert goes here
+		</div>
+	</div>
+	{% endif %}
+
+	<div class="panel panel-primary">
+		<div class="panel-heading">Graph</div>
+		<div class="panel-body" id="graph">
+		</div>
+	</div>
+
 
 	<form role="form" action="." method="post" >{% csrf_token %}
 		<div class="panel panel-primary">
@@ -99,7 +135,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{% for t in object.transaction_set.all %}
+					{% for t in object.transaction_set.all|dictsortreversed:"date" %}
 					<tr {% if t.type == "Buy" %} class="success" %} {% else %} class="danger" %} {% endif %} >
 						<td>{{t.date}}</td>
 						<td>{{t.type}}</td>
@@ -115,6 +151,32 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="panel panel-primary">
+		<div class="panel-heading">Alerts</div>
+		<div class="panel-body">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Buy Limit</th>
+						<th>Sell Limit</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for a in object.holdingalert_set.all|dictsortreversed:"created" %}
+					<tr>
+						<td>{{a.created}}</td>
+						<td>{{a.buyprice}}</td>
+						<td>{{a.sellprice}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>		
+			</table>
+		</div>
+	</div>
+
+
 	
 	<form role="form" action="." method="post" >{% csrf_token %}
 		<div class="panel panel-primary">
@@ -135,11 +197,7 @@
 		</div>
 	</form>
 	
-	<div class="panel panel-primary">
-		<div class="panel-heading">Graph</div>
-		<div class="panel-body" id="graph">
-		</div>
-	</div>
+
 
 
 
