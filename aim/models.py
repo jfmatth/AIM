@@ -95,6 +95,16 @@ class Holding(models.Model):
         for t in self.transaction_set.all():
             s = s + t.total_shares()
         return s
+
+    def cost(self):
+        tc = 0
+        for t in self.transaction_set.all():
+            tc += t.total_sale()
+            
+        return tc
+    
+    def profit(self):
+        return self.value() - self.cost()
     
     def value(self):
         if self.symbol.currentprice:
@@ -104,13 +114,14 @@ class Holding(models.Model):
         
     def alert(self):
         # if there is a buy or sell alert on this holding, this will be true
-        if self.value() > 0:
-            if self.symbol.currentprice.close < self.currentalert.buyprice:
-                return True
+        if not self.currentalert == None:
+            if self.value() > 0:
+                if self.symbol.currentprice.close < self.currentalert.buyprice:
+                    return True
+            
+                if self.symbol.currentprice.close > self.currentalert.sellprice:
+                    return True
         
-            if self.symbol.currentprice.close > self.currentalert.sellprice:
-                return True
-    
         return False
 
 
@@ -126,14 +137,18 @@ class Holding(models.Model):
 class HoldingAlert(models.Model):
     holding = models.ForeignKey(Holding)
 
-    created   = models.DateTimeField(auto_now_add=True, null=True, verbose_name="Date Created")
+    date      = models.DateField()
     buyprice  = models.DecimalField(max_digits=10, decimal_places=3)
     sellprice = models.DecimalField(max_digits=10, decimal_places=3)
 
     def __unicode__(self):
         return "%s b:%s s:%s" % (self.holding, self.buyprice,self.sellprice)
 
-    def save(self, force_insert=False, force_update=False):
+    def jsdate(self):
+        return int( (datetime.datetime.fromordinal(self.date.toordinal() )-datetime.datetime(1970,1,1)).total_seconds() * 1000 )
+
+
+    def save(self, force_insert=False, force_update=False, t=None):
         if self.id == None:
             self.buyprice = self.holding.controller.BuyPrice()
             self.sellprice = self.holding.controller.SellPrice()
@@ -257,21 +272,20 @@ class AimController(AimBase):
                     self.control += transaction.total_sale() / 2
                     
             self.started = True
-            self.save()
+            self.save(from_trans=True)
         
-            # now add a holding alert for the changes.
-            HoldingAlert(holding=self.holding).save()
-           
-            
-    def save(self, force_insert=False, force_update=False):
-        super(AimController, self).save(force_insert, force_update)
+            # now add a holding alert for the new transaction.
+        HoldingAlert(holding=self.holding, date=transaction.date).save()
 
-#         # Add a holding alert for this change to our AIM settings
-#         ha = HoldingAlert()
-#         ha.holding = self.holding
-#         ha.save()
-        if not self.id==None:
-            HoldingAlert(holding=self.holding).save()
+
+    def save(self, force_insert=False, force_update=False, from_trans=False):
+        if not from_trans and not self.id==None:
+            # if we are editing the controller settings, we should make a new alert, 
+            # and set the date to today.
+            print "Controller.save.addHoldingAlert"  
+            HoldingAlert(holding=self.holding, date=datetime.datetime.today() ).save()
+
+        super(AimController, self).save(force_insert, force_update)
         
 
     def __unicode__(self):
@@ -314,4 +328,5 @@ class Transaction(models.Model):
     def save(self, force_insert=False, force_update=False):
         super(Transaction, self).save(force_insert, force_update)
         
+        # we are done adding the transaction, not tell the controller.
         self.holding.controller.transaction(transaction=self)

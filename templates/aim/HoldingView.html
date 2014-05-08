@@ -19,15 +19,12 @@
 						text : '{{object.symbol}} Price history'
 					},
 					
-					{% if object.transaction_set.all %}
+					{% if object.currentalert %}
 					yAxis : {
 						plotBands : [{
 							from : {{object.currentalert.buyprice}},
 							to :   {{object.currentalert.sellprice}},
 							color : 'rgba(68, 170, 213, 0.2)',
-							label : {
-								text : '{{object.currentalert.buyprice}} - {{object.currentalert.sellprice}}'
-							}
 						}]
 					},
 					{% endif %}
@@ -38,6 +35,25 @@
 							data : data,
 							id: 'dataseries'
 					}
+					{% if object.holdingalert_set.all %} 
+						,{
+							name : "Alert Buy series",
+							data: [
+								{% for a in object.holdingalert_set.all|dictsort:"date" %}
+									[ {{a.jsdate}},{{a.buyprice}}]{% if not forloop.last %}, {% endif %}
+								{% endfor %}
+								]
+						},{
+							name : "Alert Sell series",
+							data: [
+								{% for a in object.holdingalert_set.all|dictsort:"date" %}
+									[ {{a.jsdate}},{{a.sellprice}}]{% if not forloop.last %}, {% endif %}
+								{% endfor %}
+								]
+						}
+					{% endif %}
+					
+					
 					{% if object.transaction_set.all %}
 					,{
 						type : 'flags',
@@ -49,8 +65,9 @@
 							}{% if not forloop.last %},{ {% endif %}{% endfor %}],
 						onSeries : 'dataseries',
 						shape : 'squarepin'
-					}]
+					}
 					{% endif %}
+					]
 				});
 			});
 		
@@ -79,20 +96,14 @@
 
 	{% if object.alert %}
 		{% if object.symbol.currentprice.close < object.currentalert.buyprice %}
-		<div class="panel panel-success">
-		<div class="panel-heading">BUY ALERT</div>
+			<div class="alert alert-success">BUY ALERT</div>
 		{% else %}
-		<div class="panel panel-danger">
-		<div class="panel-heading">SELL ALERT</div>
+		<div class="alert alert-danger">SELL ALERT</div>
 		{% endif %}
-		<div class="panel-body">
-		Alert goes here
-		</div>
-	</div>
 	{% endif %}
 
 	<div class="panel panel-primary">
-		<div class="panel-heading">Graph</div>
+		<div class="panel-heading">Graph - Current Price = {{object.symbol.currentprice.close}} </div>
 		<div class="panel-body" id="graph">
 		</div>
 	</div>
@@ -104,15 +115,20 @@
 				General
 			</div>
 			
-			<div class="panel-body">
-		    {% for field in form %}
-		        <div class="form-group">
-		            {{ field.errors }}
-		            {{ field.label_tag }} {{ field }}
-		        </div>
-		    {% endfor %}
-
-			</div>
+			<div class="panel-body"> 
+			    {% for field in form %}
+			        <div class="form-group">
+			            {{ field.errors }}
+			            {{ field.label_tag }} {{ field }}
+			        </div>
+			    {% endfor %}
+			    
+			    <!-- general fields here, not editable -->
+				<label>Shares:</label> {{ object.shares }}
+				<label>Value:</label> {{ object.value }}
+				<label>Cost:</label> {{ object.cost }}
+				<label>Profit:</label> {{object.profit}}
+			</div> <!-- panel-body -->
 			<div class="panel-footer">
 				  <input type="submit" name="_holding" class="btn btn-primary pull-right"></button>
 				  <div class="clearfix"></div>
@@ -124,6 +140,7 @@
 	<div class="panel panel-primary">
 		<div class="panel-heading">Transactions</div>
 		<div class="panel-body">
+			{% if object.transaction_set.all %}
 			<table class="table">
 				<thead>
 					<tr>
@@ -144,17 +161,16 @@
 						<td>{{t.total_sale}}</td>
 					</tr>
 					{% endfor %}
-					
-					
 				</tbody>		
-		
 			</table>
+			{% endif %}
 		</div>
 	</div>
 
 	<div class="panel panel-primary">
 		<div class="panel-heading">Alerts</div>
 		<div class="panel-body">
+			{% if object.holdingalert_set.all %}
 			<table class="table">
 				<thead>
 					<tr>
@@ -164,15 +180,16 @@
 					</tr>
 				</thead>
 				<tbody>
-					{% for a in object.holdingalert_set.all|dictsortreversed:"created" %}
+					{% for a in object.holdingalert_set.all|dictsortreversed:"date" %}
 					<tr>
-						<td>{{a.created}}</td>
+						<td>{{a.date}}</td>
 						<td>{{a.buyprice}}</td>
 						<td>{{a.sellprice}}</td>
 					</tr>
 					{% endfor %}
 				</tbody>		
 			</table>
+			{% endif %}
 		</div>
 	</div>
 
@@ -318,3 +335,5 @@
 {% endif %}
 	
 {% endblock %}
+
+<!-- data: [ [ 1396224000000, 88.1 ], [ 1396310400000, 92.27 ], [ 1396396800000, 92.61 ], [ 1396483200000, 90.99 ], [ 1396569600000, 91 ], [ 1396828800000, 89.07 ] ] -->

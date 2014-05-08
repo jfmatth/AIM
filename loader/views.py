@@ -8,6 +8,7 @@ import logging
 import csv
 import datetime
 import StringIO
+import gc
 
 from aim.models import Symbol, Price
 from loader.models import Exchange, ExchangePrice, PriceError
@@ -31,6 +32,9 @@ def ImportPrices(f):
     if not header[0] == "Symbol" or not header[1] == "Date":
         raise Exception("Error - Header line in looks wrong, %s" % header)
 
+    # add import improvement. 
+    datecheck = None
+
     for csvline in reader:
         logger.debug(csvline)
         # skip the header.
@@ -38,35 +42,46 @@ def ImportPrices(f):
             continue
 
         d = datetime.datetime.strptime(csvline[1], "%d-%b-%Y").date()
-        
-        # assume all the records are here and the exceptions add them
-        try:
-            sym = Symbol.objects.get(name=csvline[0])
-            pricedefaults = {"high":csvline[3],
-                             "low" :csvline[4],
-                             "close":csvline[5],
-                             "volume":csvline[6]
-                             }
-            p, c = Price.objects.get_or_create(symbol=sym, date=d, defaults=pricedefaults)
-#             p = Price()
-#             p.symbol = sym
-#             p.date = d
-#             p.high = csvline[3]
-#             p.low  = csvline[4]
-#             p.close = csvline[5]
-#             p.volume = csvline[6]
-#             p.save()
+
+        if not datecheck == d:
+            # this is the date we are checking, so load all symbols from price for 
+            # this date and use it for quick checking.
+            datecheck = d
+            print "Loading / Checking date %s" % datecheck
+            symbollist = set(Price.objects.filter(date=d).values_list("symbol__name", flat=True))
+
+        # now use the symbollist to verify each CSV line w/o a lookup
+        if csvline[0] in symbollist:
+            # if we already have it here, then skip.
+            pass
+        else:
             
-            # check if this price upload is 'newer' than the symbols current price
-            if sym.currentprice == None or p.date > sym.currentprice.date:
-                sym.currentprice = p
-                sym.save()
-
-        except ObjectDoesNotExist:
-            print "Problem with %s" % csvline
-            # add this to the price error if necessary
-            p, c = PriceError.objects.get_or_create(symbolname = csvline[0] )
-
+            try:
+                sym = Symbol.objects.get(name=csvline[0])
+#                 pricedefaults = {"high":csvline[3],
+#                                  "low" :csvline[4],
+#                                  "close":csvline[5],
+#                                  "volume":csvline[6]
+#                                  }
+#                 p, c = Price.objects.get_or_create(symbol=sym, date=d, defaults=pricedefaults)
+                p = Price()
+                p.symbol = sym
+                p.date = d
+                p.high = csvline[3]
+                p.low  = csvline[4]
+                p.close = csvline[5]
+                p.volume = csvline[6]
+                p.save()
+                
+                # check if this price upload is 'newer' than the symbols current price
+                if sym.currentprice == None or p.date > sym.currentprice.date:
+                    sym.currentprice = p
+                    sym.save()
+    
+            except ObjectDoesNotExist:
+                print "Problem with %s" % csvline
+                # add this to the price error if necessary
+                p, c = PriceError.objects.get_or_create(symbolname = csvline[0] )
 
 def LoadPrices(request):
 
